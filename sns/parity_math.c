@@ -1195,6 +1195,8 @@ static void isal_recover(struct m0_parity_math *math,
 
 	fail_count = fails_count(fail, unit_count);
 
+	M0_LOG(M0_DEBUG, "total failed count = %d", fail_count);
+
 	if ((fail_count == 0) || (fail_count > math->pmi_parity_count)) {
 		ret = M0_ERR_INFO(-EINVAL, "Invalid fail count value. "
 				  "fail_count = %u. Expected value "
