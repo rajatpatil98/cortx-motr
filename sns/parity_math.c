@@ -487,7 +487,7 @@ M0_INTERNAL int m0_parity_math_init(struct m0_parity_math *math,
 	math->pmi_data_count	= data_count;
 	math->pmi_parity_count	= parity_count;
 
-        if (parity_count == 1) {
+	if (parity_count == 1) {
 		math->pmi_parity_algo = M0_PARITY_CAL_ALGO_XOR;
 		return 0;
 #if ISAL_ENCODE_ENABLED
@@ -525,10 +525,6 @@ M0_INTERNAL int m0_parity_math_init(struct m0_parity_math *math,
 #else
 	} else {
 		math->pmi_parity_algo = M0_PARITY_CAL_ALGO_REED_SOLOMON;
-		/*
-                 * init galois, only first call makes initialisation,
-		 * no de-initialisation needed.
-		 */
 
 		ret = vandmat_init(&math->pmi_vandmat, data_count,
 				   parity_count);

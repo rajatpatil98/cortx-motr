@@ -1463,7 +1463,7 @@ static void ub_small_4_2_1M(int iter)
 	parity_math_tb();
 }
 
-enum { UB_ITER = 1 };
+enum { UB_ITER = 100 };
 
 struct m0_ub_set m0_parity_math_ub = {
 	.us_name = "parity-math-ub",
