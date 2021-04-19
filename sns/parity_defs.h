@@ -27,7 +27,7 @@
 /**
  *  Define the condition here to use Intel ISA library.
  */
-#define ISAL_ENCODE_ENABLED	(!defined(__KERNEL__))
+#define ISAL_ENCODE_ENABLED	(!defined(__KERNEL__) && defined(HAVE_ISAL))
 #define RS_ENCODE_ENABLED	(!ISAL_ENCODE_ENABLED)
 
 /* __MOTR_SNS_PARITY_DEFS_H__ */
