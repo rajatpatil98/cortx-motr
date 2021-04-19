@@ -1218,7 +1218,9 @@ static int pargrp_iomap_parity_recalc(struct pargrp_iomap *map)
 	}
 	pagesize = m0__page_size(ioo);
 
-	if ((op->op_code == M0_OC_WRITE && map->pi_rtype == PIR_NONE)
+	if ((op->op_code == M0_OC_WRITE
+		// && map->pi_rtype == PIR_NONE
+		)
 	    || map->pi_rtype == PIR_READREST) {
 		void *zpage;
 
