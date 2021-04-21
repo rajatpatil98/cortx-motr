@@ -9,6 +9,7 @@ ut_libmotr_ut_la_SOURCES += motr/ut/cs_ut_main.c rm/st/wlock_helper.c \
                             motr/ut/io.c \
                             motr/ut/idx.c \
                             motr/ut/idx_dix.c \
+			    motr/ut/ut_dtm_client.c \
                             motr/ut/sync.c \
                             motr/ut/layout.c \
                             motr/ut/client.h \

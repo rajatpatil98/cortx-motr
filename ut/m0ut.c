@@ -73,6 +73,7 @@ extern struct m0_ut_suite ut_suite_sync;
 extern struct m0_ut_suite ut_suite_idx;
 extern struct m0_ut_suite ut_suite_idx_dix;
 extern struct m0_ut_suite ut_suite_mt_idx_dix;
+extern struct m0_ut_suite ut_suite_mt_dtm;
 extern struct m0_ut_suite ut_suite_layout;
 extern struct m0_ut_suite ut_suite_ufid;
 extern struct m0_ut_suite cm_cp_ut;
@@ -216,6 +217,7 @@ static void tests_add(struct m0_ut_module *m)
 	m0_ut_add(m, &ut_suite_idx, true);
 	m0_ut_add(m, &ut_suite_idx_dix, true);
 	m0_ut_add(m, &ut_suite_mt_idx_dix, true);
+	m0_ut_add(m, &ut_suite_mt_dtm, true);
 	m0_ut_add(m, &ut_suite_layout, true);
 	m0_ut_add(m, &ut_suite_ufid, true);
 	m0_ut_add(m, &cm_cp_ut, true);
