@@ -159,7 +159,6 @@ static void idx_dix_ut_fini()
 	m0_rpc_server_stop(&dix_ut_sctx);
 }
 
-
 static uint8_t ifid_type(bool dist)
 {
 	return dist ? m0_dix_fid_type.ft_id : m0_cas_index_fid_type.ft_id;
