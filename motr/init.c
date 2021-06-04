@@ -56,6 +56,7 @@
 #include "conf/fop.h"           /* m0_conf_fops_init, m0_confx_types_init */
 #include "conf/obj.h"           /* m0_conf_obj_init */
 #include "pool/policy.h"        /* m0_pver_policies_init */
+#include "reds/red_service.h"        /* m0_pver_policies_init */
 #ifdef __KERNEL__
 #  include "m0t1fs/linux_kernel/m0t1fs.h"
 #  include "motr/linux_kernel/dummy_init_fini.h"
@@ -238,6 +239,7 @@ struct init_fini_call subsystem[] = {
 	{ &m0_fdmi_init,         &m0_fdmi_fini,         "fdmi" },
 	{ &m0_fol_fdmi_src_init, &m0_fol_fdmi_src_fini, "fol_fdmi_source" },
 	{ &m0_dtm0_stype_init,   &m0_dtm0_stype_fini,   "dtm0"},
+	{ &m0_red_register,      &m0_red_unregister,    "red service"}
 #endif
 };
 

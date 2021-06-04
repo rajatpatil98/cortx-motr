@@ -110,6 +110,7 @@ include $(src)/stats/Kbuild.sub
 include $(src)/stob/Kbuild.sub
 include $(src)/xcode/Kbuild.sub
 include $(src)/helpers/Kbuild.sub
+include $(src)/reds/Kbuild.sub
 
 
 #

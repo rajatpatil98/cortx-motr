@@ -172,6 +172,7 @@ extern struct m0_ut_suite xcode_bufvec_fop_ut;
 extern struct m0_ut_suite xcode_ff2c_ut;
 extern struct m0_ut_suite xcode_ut;
 extern struct m0_ut_suite sns_flock_ut;
+extern struct m0_ut_suite red_ut;
 
 static void tests_add(struct m0_ut_module *m)
 {
@@ -312,6 +313,7 @@ static void tests_add(struct m0_ut_module *m)
 
 	/* These tests have redirection of messages. */
 	m0_ut_add(m, &console_ut, true);
+	m0_ut_add(m, &red_ut, true);
 }
 
 int main(int argc, char *argv[])

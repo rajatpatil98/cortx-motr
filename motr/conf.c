@@ -106,6 +106,7 @@ service_options_add(struct cs_args *args, const struct m0_conf_service *svc)
 		[M0_CST_CLIENT]  = "",
 		[M0_CST_ISCS]    = "",
 		[M0_CST_DTM0]    = "",
+		[M0_CST_RED]    = "",
 	};
 	int         i;
 	const char *opt;

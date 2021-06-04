@@ -262,6 +262,7 @@ include $(top_srcdir)/stats/Makefile.sub
 include $(top_srcdir)/udb/Makefile.sub
 include $(top_srcdir)/xcode/Makefile.sub
 include $(top_srcdir)/scripts/systemtap/kem/Makefile.sub
+include $(top_srcdir)/reds/Makefile.sub
 
 #
 # libmotr-altogether.so ------------------------------- {{{2
@@ -400,6 +401,7 @@ include $(top_srcdir)/udb/ut/Makefile.sub
 include $(top_srcdir)/ut/Makefile.sub
 include $(top_srcdir)/xcode/ut/Makefile.sub
 include $(top_srcdir)/helpers/ut/Makefile.sub
+include $(top_srcdir)/reds/ut/Makefile.sub
 
 
 ################################################################################
@@ -1123,7 +1125,8 @@ EXTRA_DIST += \
               utils/Kbuild.sub \
               xcode/Kbuild.sub \
               xcode/ut/Kbuild.sub \
-              helpers/Kbuild.sub
+              helpers/Kbuild.sub \
+			  reds/Kbuild.sub
 
 
 ################################################################################

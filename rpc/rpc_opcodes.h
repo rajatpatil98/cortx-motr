@@ -355,6 +355,8 @@ enum M0_RPC_OPCODES {
 	M0_FDMI_PLUGIN_DOCK_OPCODE          = 1070,
 	M0_FDMI_SOURCE_DOCK_OPCODE          = 1071,
 	M0_ISCSERVICE_EXEC_OPCODE           = 1072,
+	M0_RED_REQ_OPCODE                   = 1074,
+	M0_RED_REP_OPCODE                   = 1075,
 
 	M0_OPCODES_NR                       = 2048
 } M0_XCA_ENUM;

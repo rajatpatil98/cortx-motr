@@ -27,6 +27,8 @@
 #include "lib/fs.h"         /* m0_file_read */
 #include "rpc/rpclib.h"     /* m0_rpc_server_ctx */
 #include "ut/ut.h"
+#include "net/lnet/lnet.h"
+
 
 struct m0_conf_cache m0_conf_ut_cache;
 struct m0_sm_group   m0_conf_ut_grp;
