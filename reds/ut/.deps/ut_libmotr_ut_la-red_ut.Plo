@@ -1,0 +1,776 @@
+reds/ut/ut_libmotr_ut_la-red_ut.lo: reds/ut/red_ut.c \
+ /usr/include/stdc-predef.h config.h /root/motr2/cortx-motr/lib/trace.h \
+ /usr/lib/gcc/x86_64-redhat-linux/4.8.5/include/stdarg.h \
+ /root/motr2/cortx-motr/lib/types.h \
+ /root/motr2/cortx-motr/lib/user_space/types.h \
+ /usr/lib/gcc/x86_64-redhat-linux/4.8.5/include/stdint.h \
+ /usr/include/stdint.h /usr/include/features.h /usr/include/sys/cdefs.h \
+ /usr/include/bits/wordsize.h /usr/include/gnu/stubs.h \
+ /usr/include/gnu/stubs-64.h /usr/include/bits/wchar.h \
+ /usr/lib/gcc/x86_64-redhat-linux/4.8.5/include/stdbool.h \
+ /usr/include/sys/types.h /usr/include/bits/types.h \
+ /usr/include/bits/typesizes.h /usr/include/time.h \
+ /usr/lib/gcc/x86_64-redhat-linux/4.8.5/include/stddef.h \
+ /usr/include/endian.h /usr/include/bits/endian.h \
+ /usr/include/bits/byteswap.h /usr/include/bits/byteswap-16.h \
+ /usr/include/sys/select.h /usr/include/bits/select.h \
+ /usr/include/bits/sigset.h /usr/include/bits/time.h \
+ /usr/include/sys/sysmacros.h /usr/include/bits/pthreadtypes.h \
+ /usr/include/inttypes.h \
+ /usr/lib/gcc/x86_64-redhat-linux/4.8.5/include/limits.h \
+ /usr/lib/gcc/x86_64-redhat-linux/4.8.5/include/syslimits.h \
+ /usr/include/limits.h /usr/include/bits/posix1_lim.h \
+ /usr/include/bits/local_lim.h /usr/include/linux/limits.h \
+ /usr/include/bits/posix2_lim.h /usr/include/bits/xopen_lim.h \
+ /usr/include/bits/stdio_lim.h /root/motr2/cortx-motr/xcode/xcode_attr.h \
+ /root/motr2/cortx-motr/lib/arith.h /root/motr2/cortx-motr/lib/assert.h \
+ /root/motr2/cortx-motr/lib/atomic.h \
+ /root/motr2/cortx-motr/lib/user_space/user_x86_64_atomic.h \
+ /root/motr2/cortx-motr/lib/time.h \
+ /root/motr2/cortx-motr/lib/user_space/time.h /usr/include/bits/timex.h \
+ /usr/include/xlocale.h /root/motr2/cortx-motr/lib/misc.h \
+ /usr/include/string.h /usr/include/bits/string.h \
+ /usr/include/bits/string2.h /usr/include/stdlib.h \
+ /root/motr2/cortx-motr/lib/user_space/misc.h \
+ /root/motr2/cortx-motr/lib/buf.h /root/motr2/cortx-motr/motr/magic.h \
+ /root/motr2/cortx-motr/lib/user_space/trace.h /usr/include/stdio.h \
+ /usr/include/libio.h /usr/include/_G_config.h /usr/include/wchar.h \
+ /usr/include/bits/sys_errlist.h /usr/include/bits/stdio.h \
+ /usr/include/sys/user.h /root/motr2/cortx-motr/lib/finject.h \
+ /root/motr2/cortx-motr/config.h /root/motr2/cortx-motr/conf/ut/common.h \
+ /root/motr2/cortx-motr/conf/confc.h /root/motr2/cortx-motr/conf/cache.h \
+ /root/motr2/cortx-motr/conf/obj.h /root/motr2/cortx-motr/conf/schema.h \
+ /root/motr2/cortx-motr/xcode/xcode.h /root/motr2/cortx-motr/lib/vec.h \
+ /root/motr2/cortx-motr/lib/varr.h /root/motr2/cortx-motr/xcode/enum.h \
+ /root/motr2/cortx-motr/ha/note.h /root/motr2/cortx-motr/fid/fid.h \
+ /root/motr2/cortx-motr/fid/fid_xc.h /root/motr2/cortx-motr/lib/chan.h \
+ /root/motr2/cortx-motr/lib/tlist.h /root/motr2/cortx-motr/lib/list.h \
+ /root/motr2/cortx-motr/lib/list_xc.h /root/motr2/cortx-motr/lib/mutex.h \
+ /root/motr2/cortx-motr/addb2/histogram.h \
+ /root/motr2/cortx-motr/addb2/counter.h \
+ /root/motr2/cortx-motr/addb2/addb2.h \
+ /root/motr2/cortx-motr/addb2/internal.h \
+ /root/motr2/cortx-motr/lib/user_space/mutex.h /usr/include/pthread.h \
+ /usr/include/sched.h /usr/include/bits/sched.h \
+ /usr/include/bits/setjmp.h /root/motr2/cortx-motr/lib/semaphore.h \
+ /root/motr2/cortx-motr/lib/user_space/semaphore.h \
+ /usr/include/semaphore.h /usr/include/bits/semaphore.h \
+ /root/motr2/cortx-motr/lib/buf_xc.h \
+ /root/motr2/cortx-motr/ha/dispatcher.h \
+ /root/motr2/cortx-motr/module/module.h \
+ /root/motr2/cortx-motr/layout/pdclust.h \
+ /root/motr2/cortx-motr/sns/parity_math.h \
+ /root/motr2/cortx-motr/lib/bitmap.h /root/motr2/cortx-motr/sns/matvec.h \
+ /root/motr2/cortx-motr/sns/parity_ops.h /usr/include/isa-l.h \
+ /usr/include/isa-l/crc.h /usr/include/isa-l/crc64.h \
+ /usr/include/isa-l/erasure_code.h /usr/include/isa-l/gf_vect_mul.h \
+ /usr/include/isa-l/gf_vect_mul.h /usr/include/isa-l/igzip_lib.h \
+ /usr/include/isa-l/mem_routines.h /usr/include/isa-l/raid.h \
+ /root/motr2/cortx-motr/sns/ls_solve.h \
+ /root/motr2/cortx-motr/layout/layout.h /root/motr2/cortx-motr/lib/refs.h \
+ /root/motr2/cortx-motr/layout/layout_pver.h \
+ /root/motr2/cortx-motr/lib/protocol.h /root/motr2/cortx-motr/lib/bob.h \
+ /root/motr2/cortx-motr/fdmi/filter.h \
+ /root/motr2/cortx-motr/conf/onwire.h \
+ /root/motr2/cortx-motr/lib/bitmap_xc.h \
+ /root/motr2/cortx-motr/conf/schema_xc.h \
+ /root/motr2/cortx-motr/fdmi/filter_xc.h \
+ /root/motr2/cortx-motr/pool/policy_xc.h /root/motr2/cortx-motr/sm/sm.h \
+ /root/motr2/cortx-motr/lib/timer.h \
+ /root/motr2/cortx-motr/lib/user_space/timer.h \
+ /root/motr2/cortx-motr/lib/thread.h \
+ /root/motr2/cortx-motr/lib/user_space/thread.h /usr/include/setjmp.h \
+ /usr/include/signal.h /usr/include/bits/signum.h \
+ /usr/include/bits/siginfo.h /usr/include/bits/sigaction.h \
+ /usr/include/bits/sigcontext.h /usr/include/bits/sigstack.h \
+ /usr/include/sys/ucontext.h /usr/include/bits/sigthread.h \
+ /root/motr2/cortx-motr/rpc/link.h /root/motr2/cortx-motr/fop/fom.h \
+ /root/motr2/cortx-motr/lib/queue.h /root/motr2/cortx-motr/lib/locality.h \
+ /root/motr2/cortx-motr/lib/processor.h \
+ /root/motr2/cortx-motr/lib/lockers.h /root/motr2/cortx-motr/dtm/dtm.h \
+ /root/motr2/cortx-motr/fol/fol.h /root/motr2/cortx-motr/be/tx_credit.h \
+ /root/motr2/cortx-motr/dtm/dtm_update.h \
+ /root/motr2/cortx-motr/lib/types_xc.h \
+ /root/motr2/cortx-motr/dtm/dtm_update_xc.h \
+ /root/motr2/cortx-motr/fdmi/src_rec.h \
+ /root/motr2/cortx-motr/dtm/history.h /root/motr2/cortx-motr/lib/cookie.h \
+ /root/motr2/cortx-motr/dtm/nucleus.h \
+ /root/motr2/cortx-motr/dtm/operation.h \
+ /root/motr2/cortx-motr/dtm/update.h \
+ /root/motr2/cortx-motr/lib/cookie_xc.h \
+ /root/motr2/cortx-motr/dtm/update_xc.h \
+ /root/motr2/cortx-motr/dtm/catalogue.h /root/motr2/cortx-motr/dtm/fol.h \
+ /root/motr2/cortx-motr/be/tx.h /root/motr2/cortx-motr/be/tx_regmap.h \
+ /root/motr2/cortx-motr/be/seg.h /root/motr2/cortx-motr/be/alloc.h \
+ /root/motr2/cortx-motr/be/seg_dict.h /root/motr2/cortx-motr/stob/stob.h \
+ /root/motr2/cortx-motr/lib/rwlock.h \
+ /root/motr2/cortx-motr/lib/user_space/rwlock.h \
+ /root/motr2/cortx-motr/stob/cache.h /root/motr2/cortx-motr/be/extmap.h \
+ /root/motr2/cortx-motr/lib/ext.h /root/motr2/cortx-motr/format/format.h \
+ /root/motr2/cortx-motr/format/format_xc.h \
+ /root/motr2/cortx-motr/lib/ext_xc.h /root/motr2/cortx-motr/be/btree.h \
+ /root/motr2/cortx-motr/be/op.h /root/motr2/cortx-motr/be/seg_xc.h \
+ /root/motr2/cortx-motr/be/btree_xc.h \
+ /root/motr2/cortx-motr/be/extmap_internal.h \
+ /root/motr2/cortx-motr/be/extmap_internal_xc.h \
+ /root/motr2/cortx-motr/addb2/sys.h /root/motr2/cortx-motr/rpc/conn.h \
+ /root/motr2/cortx-motr/rpc/onwire.h /root/motr2/cortx-motr/rpc/session.h \
+ /root/motr2/cortx-motr/rpc/item.h \
+ /root/motr2/cortx-motr/reds/red_command.h \
+ /root/motr2/cortx-motr/rpc/rpclib.h /root/motr2/cortx-motr/motr/setup.h \
+ /root/motr2/cortx-motr/reqh/reqh_service.h \
+ /root/motr2/cortx-motr/net/lnet/lnet.h /root/motr2/cortx-motr/net/net.h \
+ /root/motr2/cortx-motr/lib/cond.h \
+ /root/motr2/cortx-motr/net/net_otw_types.h \
+ /root/motr2/cortx-motr/net/net_otw_types_xc.h \
+ /root/motr2/cortx-motr/net/buffer_pool.h \
+ /root/motr2/cortx-motr/mdstore/mdstore.h \
+ /root/motr2/cortx-motr/cob/cob.h /root/motr2/cortx-motr/file/file.h \
+ /root/motr2/cortx-motr/lib/errno.h /usr/include/errno.h \
+ /usr/include/bits/errno.h /usr/include/linux/errno.h \
+ /usr/include/asm/errno.h /usr/include/asm-generic/errno.h \
+ /usr/include/asm-generic/errno-base.h \
+ /root/motr2/cortx-motr/lib/memory.h /root/motr2/cortx-motr/rm/rm.h \
+ /root/motr2/cortx-motr/rm/rm_ha.h /root/motr2/cortx-motr/conf/diter.h \
+ /root/motr2/cortx-motr/rm/rm_internal.h /root/motr2/cortx-motr/file/di.h \
+ /root/motr2/cortx-motr/ioservice/io_fops.h \
+ /root/motr2/cortx-motr/fop/fop.h /root/motr2/cortx-motr/fop/fop_xc.h \
+ /root/motr2/cortx-motr/fop/fom_generic.h \
+ /root/motr2/cortx-motr/lib/string.h /usr/include/ctype.h \
+ /usr/include/bits/waitflags.h /usr/include/bits/waitstatus.h \
+ /usr/include/alloca.h /usr/include/bits/stdlib-float.h \
+ /root/motr2/cortx-motr/lib/string_xc.h /root/motr2/cortx-motr/be/tx_xc.h \
+ /root/motr2/cortx-motr/fop/fom_generic_xc.h \
+ /root/motr2/cortx-motr/rpc/rpc.h \
+ /root/motr2/cortx-motr/rpc/rpc_machine.h \
+ /root/motr2/cortx-motr/rpc/bulk.h \
+ /root/motr2/cortx-motr/rpc/rpc_helpers.h \
+ /root/motr2/cortx-motr/rpc/item_source.h \
+ /root/motr2/cortx-motr/lib/vec_xc.h \
+ /root/motr2/cortx-motr/mdservice/md_fops.h \
+ /root/motr2/cortx-motr/mdservice/md_fops_xc.h \
+ /root/motr2/cortx-motr/lib/bitstring.h \
+ /root/motr2/cortx-motr/lib/bitstring_xc.h \
+ /root/motr2/cortx-motr/mdservice/md_fid.h \
+ /root/motr2/cortx-motr/reqh/reqh.h /root/motr2/cortx-motr/conf/rconfc.h \
+ /root/motr2/cortx-motr/ha/entrypoint_fops.h \
+ /root/motr2/cortx-motr/ha/link_fops.h /root/motr2/cortx-motr/ha/msg.h \
+ /root/motr2/cortx-motr/stob/ioq_error.h /root/motr2/cortx-motr/stob/io.h \
+ /root/motr2/cortx-motr/stob/stob_xc.h \
+ /root/motr2/cortx-motr/ha/failvec.h /root/motr2/cortx-motr/ha/note_xc.h \
+ /root/motr2/cortx-motr/motr/keepalive.h /root/motr2/cortx-motr/conf/ha.h \
+ /root/motr2/cortx-motr/rpc/ha.h /root/motr2/cortx-motr/be/ha.h \
+ /root/motr2/cortx-motr/sns/cm/ha.h \
+ /root/motr2/cortx-motr/stob/ioq_error_xc.h \
+ /root/motr2/cortx-motr/ha/failvec_xc.h \
+ /root/motr2/cortx-motr/motr/keepalive_xc.h \
+ /root/motr2/cortx-motr/conf/ha_xc.h /root/motr2/cortx-motr/rpc/ha_xc.h \
+ /root/motr2/cortx-motr/be/ha_xc.h /root/motr2/cortx-motr/sns/cm/ha_xc.h \
+ /root/motr2/cortx-motr/ha/msg_xc.h /root/motr2/cortx-motr/ha/cookie.h \
+ /root/motr2/cortx-motr/ha/link_fops_xc.h \
+ /root/motr2/cortx-motr/ha/cookie_xc.h /root/motr2/cortx-motr/ha/epoch.h \
+ /usr/include/yaml.h /root/motr2/cortx-motr/be/ut/helper.h \
+ /root/motr2/cortx-motr/be/domain.h /root/motr2/cortx-motr/be/engine.h \
+ /root/motr2/cortx-motr/be/log.h /root/motr2/cortx-motr/be/fmt.h \
+ /root/motr2/cortx-motr/be/log_store.h \
+ /root/motr2/cortx-motr/be/log_sched.h /root/motr2/cortx-motr/be/io.h \
+ /root/motr2/cortx-motr/be/io_sched.h \
+ /root/motr2/cortx-motr/be/recovery.h \
+ /root/motr2/cortx-motr/be/tx_group.h \
+ /root/motr2/cortx-motr/be/tx_group_format.h \
+ /root/motr2/cortx-motr/be/tx_group_fom.h \
+ /root/motr2/cortx-motr/be/seg0.h /root/motr2/cortx-motr/be/pd.h \
+ /root/motr2/cortx-motr/be/pool.h /root/motr2/cortx-motr/be/log_discard.h \
+ /root/motr2/cortx-motr/pool/pool.h /root/motr2/cortx-motr/lib/tlist_xc.h \
+ /root/motr2/cortx-motr/fd/fd.h \
+ /root/motr2/cortx-motr/pool/pool_machine.h \
+ /root/motr2/cortx-motr/pool/pool_machine_xc.h \
+ /root/motr2/cortx-motr/pool/policy.h /root/motr2/cortx-motr/ha/ha.h \
+ /root/motr2/cortx-motr/ha/entrypoint.h /root/motr2/cortx-motr/motr/ha.h \
+ /root/motr2/cortx-motr/ut/misc.h /root/motr2/cortx-motr/ut/ut.h
+
+/usr/include/stdc-predef.h:
+
+config.h:
+
+/root/motr2/cortx-motr/lib/trace.h:
+
+/usr/lib/gcc/x86_64-redhat-linux/4.8.5/include/stdarg.h:
+
+/root/motr2/cortx-motr/lib/types.h:
+
+/root/motr2/cortx-motr/lib/user_space/types.h:
+
+/usr/lib/gcc/x86_64-redhat-linux/4.8.5/include/stdint.h:
+
+/usr/include/stdint.h:
+
+/usr/include/features.h:
+
+/usr/include/sys/cdefs.h:
+
+/usr/include/bits/wordsize.h:
+
+/usr/include/gnu/stubs.h:
+
+/usr/include/gnu/stubs-64.h:
+
+/usr/include/bits/wchar.h:
+
+/usr/lib/gcc/x86_64-redhat-linux/4.8.5/include/stdbool.h:
+
+/usr/include/sys/types.h:
+
+/usr/include/bits/types.h:
+
+/usr/include/bits/typesizes.h:
+
+/usr/include/time.h:
+
+/usr/lib/gcc/x86_64-redhat-linux/4.8.5/include/stddef.h:
+
+/usr/include/endian.h:
+
+/usr/include/bits/endian.h:
+
+/usr/include/bits/byteswap.h:
+
+/usr/include/bits/byteswap-16.h:
+
+/usr/include/sys/select.h:
+
+/usr/include/bits/select.h:
+
+/usr/include/bits/sigset.h:
+
+/usr/include/bits/time.h:
+
+/usr/include/sys/sysmacros.h:
+
+/usr/include/bits/pthreadtypes.h:
+
+/usr/include/inttypes.h:
+
+/usr/lib/gcc/x86_64-redhat-linux/4.8.5/include/limits.h:
+
+/usr/lib/gcc/x86_64-redhat-linux/4.8.5/include/syslimits.h:
+
+/usr/include/limits.h:
+
+/usr/include/bits/posix1_lim.h:
+
+/usr/include/bits/local_lim.h:
+
+/usr/include/linux/limits.h:
+
+/usr/include/bits/posix2_lim.h:
+
+/usr/include/bits/xopen_lim.h:
+
+/usr/include/bits/stdio_lim.h:
+
+/root/motr2/cortx-motr/xcode/xcode_attr.h:
+
+/root/motr2/cortx-motr/lib/arith.h:
+
+/root/motr2/cortx-motr/lib/assert.h:
+
+/root/motr2/cortx-motr/lib/atomic.h:
+
+/root/motr2/cortx-motr/lib/user_space/user_x86_64_atomic.h:
+
+/root/motr2/cortx-motr/lib/time.h:
+
+/root/motr2/cortx-motr/lib/user_space/time.h:
+
+/usr/include/bits/timex.h:
+
+/usr/include/xlocale.h:
+
+/root/motr2/cortx-motr/lib/misc.h:
+
+/usr/include/string.h:
+
+/usr/include/bits/string.h:
+
+/usr/include/bits/string2.h:
+
+/usr/include/stdlib.h:
+
+/root/motr2/cortx-motr/lib/user_space/misc.h:
+
+/root/motr2/cortx-motr/lib/buf.h:
+
+/root/motr2/cortx-motr/motr/magic.h:
+
+/root/motr2/cortx-motr/lib/user_space/trace.h:
+
+/usr/include/stdio.h:
+
+/usr/include/libio.h:
+
+/usr/include/_G_config.h:
+
+/usr/include/wchar.h:
+
+/usr/include/bits/sys_errlist.h:
+
+/usr/include/bits/stdio.h:
+
+/usr/include/sys/user.h:
+
+/root/motr2/cortx-motr/lib/finject.h:
+
+/root/motr2/cortx-motr/config.h:
+
+/root/motr2/cortx-motr/conf/ut/common.h:
+
+/root/motr2/cortx-motr/conf/confc.h:
+
+/root/motr2/cortx-motr/conf/cache.h:
+
+/root/motr2/cortx-motr/conf/obj.h:
+
+/root/motr2/cortx-motr/conf/schema.h:
+
+/root/motr2/cortx-motr/xcode/xcode.h:
+
+/root/motr2/cortx-motr/lib/vec.h:
+
+/root/motr2/cortx-motr/lib/varr.h:
+
+/root/motr2/cortx-motr/xcode/enum.h:
+
+/root/motr2/cortx-motr/ha/note.h:
+
+/root/motr2/cortx-motr/fid/fid.h:
+
+/root/motr2/cortx-motr/fid/fid_xc.h:
+
+/root/motr2/cortx-motr/lib/chan.h:
+
+/root/motr2/cortx-motr/lib/tlist.h:
+
+/root/motr2/cortx-motr/lib/list.h:
+
+/root/motr2/cortx-motr/lib/list_xc.h:
+
+/root/motr2/cortx-motr/lib/mutex.h:
+
+/root/motr2/cortx-motr/addb2/histogram.h:
+
+/root/motr2/cortx-motr/addb2/counter.h:
+
+/root/motr2/cortx-motr/addb2/addb2.h:
+
+/root/motr2/cortx-motr/addb2/internal.h:
+
+/root/motr2/cortx-motr/lib/user_space/mutex.h:
+
+/usr/include/pthread.h:
+
+/usr/include/sched.h:
+
+/usr/include/bits/sched.h:
+
+/usr/include/bits/setjmp.h:
+
+/root/motr2/cortx-motr/lib/semaphore.h:
+
+/root/motr2/cortx-motr/lib/user_space/semaphore.h:
+
+/usr/include/semaphore.h:
+
+/usr/include/bits/semaphore.h:
+
+/root/motr2/cortx-motr/lib/buf_xc.h:
+
+/root/motr2/cortx-motr/ha/dispatcher.h:
+
+/root/motr2/cortx-motr/module/module.h:
+
+/root/motr2/cortx-motr/layout/pdclust.h:
+
+/root/motr2/cortx-motr/sns/parity_math.h:
+
+/root/motr2/cortx-motr/lib/bitmap.h:
+
+/root/motr2/cortx-motr/sns/matvec.h:
+
+/root/motr2/cortx-motr/sns/parity_ops.h:
+
+/usr/include/isa-l.h:
+
+/usr/include/isa-l/crc.h:
+
+/usr/include/isa-l/crc64.h:
+
+/usr/include/isa-l/erasure_code.h:
+
+/usr/include/isa-l/gf_vect_mul.h:
+
+/usr/include/isa-l/gf_vect_mul.h:
+
+/usr/include/isa-l/igzip_lib.h:
+
+/usr/include/isa-l/mem_routines.h:
+
+/usr/include/isa-l/raid.h:
+
+/root/motr2/cortx-motr/sns/ls_solve.h:
+
+/root/motr2/cortx-motr/layout/layout.h:
+
+/root/motr2/cortx-motr/lib/refs.h:
+
+/root/motr2/cortx-motr/layout/layout_pver.h:
+
+/root/motr2/cortx-motr/lib/protocol.h:
+
+/root/motr2/cortx-motr/lib/bob.h:
+
+/root/motr2/cortx-motr/fdmi/filter.h:
+
+/root/motr2/cortx-motr/conf/onwire.h:
+
+/root/motr2/cortx-motr/lib/bitmap_xc.h:
+
+/root/motr2/cortx-motr/conf/schema_xc.h:
+
+/root/motr2/cortx-motr/fdmi/filter_xc.h:
+
+/root/motr2/cortx-motr/pool/policy_xc.h:
+
+/root/motr2/cortx-motr/sm/sm.h:
+
+/root/motr2/cortx-motr/lib/timer.h:
+
+/root/motr2/cortx-motr/lib/user_space/timer.h:
+
+/root/motr2/cortx-motr/lib/thread.h:
+
+/root/motr2/cortx-motr/lib/user_space/thread.h:
+
+/usr/include/setjmp.h:
+
+/usr/include/signal.h:
+
+/usr/include/bits/signum.h:
+
+/usr/include/bits/siginfo.h:
+
+/usr/include/bits/sigaction.h:
+
+/usr/include/bits/sigcontext.h:
+
+/usr/include/bits/sigstack.h:
+
+/usr/include/sys/ucontext.h:
+
+/usr/include/bits/sigthread.h:
+
+/root/motr2/cortx-motr/rpc/link.h:
+
+/root/motr2/cortx-motr/fop/fom.h:
+
+/root/motr2/cortx-motr/lib/queue.h:
+
+/root/motr2/cortx-motr/lib/locality.h:
+
+/root/motr2/cortx-motr/lib/processor.h:
+
+/root/motr2/cortx-motr/lib/lockers.h:
+
+/root/motr2/cortx-motr/dtm/dtm.h:
+
+/root/motr2/cortx-motr/fol/fol.h:
+
+/root/motr2/cortx-motr/be/tx_credit.h:
+
+/root/motr2/cortx-motr/dtm/dtm_update.h:
+
+/root/motr2/cortx-motr/lib/types_xc.h:
+
+/root/motr2/cortx-motr/dtm/dtm_update_xc.h:
+
+/root/motr2/cortx-motr/fdmi/src_rec.h:
+
+/root/motr2/cortx-motr/dtm/history.h:
+
+/root/motr2/cortx-motr/lib/cookie.h:
+
+/root/motr2/cortx-motr/dtm/nucleus.h:
+
+/root/motr2/cortx-motr/dtm/operation.h:
+
+/root/motr2/cortx-motr/dtm/update.h:
+
+/root/motr2/cortx-motr/lib/cookie_xc.h:
+
+/root/motr2/cortx-motr/dtm/update_xc.h:
+
+/root/motr2/cortx-motr/dtm/catalogue.h:
+
+/root/motr2/cortx-motr/dtm/fol.h:
+
+/root/motr2/cortx-motr/be/tx.h:
+
+/root/motr2/cortx-motr/be/tx_regmap.h:
+
+/root/motr2/cortx-motr/be/seg.h:
+
+/root/motr2/cortx-motr/be/alloc.h:
+
+/root/motr2/cortx-motr/be/seg_dict.h:
+
+/root/motr2/cortx-motr/stob/stob.h:
+
+/root/motr2/cortx-motr/lib/rwlock.h:
+
+/root/motr2/cortx-motr/lib/user_space/rwlock.h:
+
+/root/motr2/cortx-motr/stob/cache.h:
+
+/root/motr2/cortx-motr/be/extmap.h:
+
+/root/motr2/cortx-motr/lib/ext.h:
+
+/root/motr2/cortx-motr/format/format.h:
+
+/root/motr2/cortx-motr/format/format_xc.h:
+
+/root/motr2/cortx-motr/lib/ext_xc.h:
+
+/root/motr2/cortx-motr/be/btree.h:
+
+/root/motr2/cortx-motr/be/op.h:
+
+/root/motr2/cortx-motr/be/seg_xc.h:
+
+/root/motr2/cortx-motr/be/btree_xc.h:
+
+/root/motr2/cortx-motr/be/extmap_internal.h:
+
+/root/motr2/cortx-motr/be/extmap_internal_xc.h:
+
+/root/motr2/cortx-motr/addb2/sys.h:
+
+/root/motr2/cortx-motr/rpc/conn.h:
+
+/root/motr2/cortx-motr/rpc/onwire.h:
+
+/root/motr2/cortx-motr/rpc/session.h:
+
+/root/motr2/cortx-motr/rpc/item.h:
+
+/root/motr2/cortx-motr/reds/red_command.h:
+
+/root/motr2/cortx-motr/rpc/rpclib.h:
+
+/root/motr2/cortx-motr/motr/setup.h:
+
+/root/motr2/cortx-motr/reqh/reqh_service.h:
+
+/root/motr2/cortx-motr/net/lnet/lnet.h:
+
+/root/motr2/cortx-motr/net/net.h:
+
+/root/motr2/cortx-motr/lib/cond.h:
+
+/root/motr2/cortx-motr/net/net_otw_types.h:
+
+/root/motr2/cortx-motr/net/net_otw_types_xc.h:
+
+/root/motr2/cortx-motr/net/buffer_pool.h:
+
+/root/motr2/cortx-motr/mdstore/mdstore.h:
+
+/root/motr2/cortx-motr/cob/cob.h:
+
+/root/motr2/cortx-motr/file/file.h:
+
+/root/motr2/cortx-motr/lib/errno.h:
+
+/usr/include/errno.h:
+
+/usr/include/bits/errno.h:
+
+/usr/include/linux/errno.h:
+
+/usr/include/asm/errno.h:
+
+/usr/include/asm-generic/errno.h:
+
+/usr/include/asm-generic/errno-base.h:
+
+/root/motr2/cortx-motr/lib/memory.h:
+
+/root/motr2/cortx-motr/rm/rm.h:
+
+/root/motr2/cortx-motr/rm/rm_ha.h:
+
+/root/motr2/cortx-motr/conf/diter.h:
+
+/root/motr2/cortx-motr/rm/rm_internal.h:
+
+/root/motr2/cortx-motr/file/di.h:
+
+/root/motr2/cortx-motr/ioservice/io_fops.h:
+
+/root/motr2/cortx-motr/fop/fop.h:
+
+/root/motr2/cortx-motr/fop/fop_xc.h:
+
+/root/motr2/cortx-motr/fop/fom_generic.h:
+
+/root/motr2/cortx-motr/lib/string.h:
+
+/usr/include/ctype.h:
+
+/usr/include/bits/waitflags.h:
+
+/usr/include/bits/waitstatus.h:
+
+/usr/include/alloca.h:
+
+/usr/include/bits/stdlib-float.h:
+
+/root/motr2/cortx-motr/lib/string_xc.h:
+
+/root/motr2/cortx-motr/be/tx_xc.h:
+
+/root/motr2/cortx-motr/fop/fom_generic_xc.h:
+
+/root/motr2/cortx-motr/rpc/rpc.h:
+
+/root/motr2/cortx-motr/rpc/rpc_machine.h:
+
+/root/motr2/cortx-motr/rpc/bulk.h:
+
+/root/motr2/cortx-motr/rpc/rpc_helpers.h:
+
+/root/motr2/cortx-motr/rpc/item_source.h:
+
+/root/motr2/cortx-motr/lib/vec_xc.h:
+
+/root/motr2/cortx-motr/mdservice/md_fops.h:
+
+/root/motr2/cortx-motr/mdservice/md_fops_xc.h:
+
+/root/motr2/cortx-motr/lib/bitstring.h:
+
+/root/motr2/cortx-motr/lib/bitstring_xc.h:
+
+/root/motr2/cortx-motr/mdservice/md_fid.h:
+
+/root/motr2/cortx-motr/reqh/reqh.h:
+
+/root/motr2/cortx-motr/conf/rconfc.h:
+
+/root/motr2/cortx-motr/ha/entrypoint_fops.h:
+
+/root/motr2/cortx-motr/ha/link_fops.h:
+
+/root/motr2/cortx-motr/ha/msg.h:
+
+/root/motr2/cortx-motr/stob/ioq_error.h:
+
+/root/motr2/cortx-motr/stob/io.h:
+
+/root/motr2/cortx-motr/stob/stob_xc.h:
+
+/root/motr2/cortx-motr/ha/failvec.h:
+
+/root/motr2/cortx-motr/ha/note_xc.h:
+
+/root/motr2/cortx-motr/motr/keepalive.h:
+
+/root/motr2/cortx-motr/conf/ha.h:
+
+/root/motr2/cortx-motr/rpc/ha.h:
+
+/root/motr2/cortx-motr/be/ha.h:
+
+/root/motr2/cortx-motr/sns/cm/ha.h:
+
+/root/motr2/cortx-motr/stob/ioq_error_xc.h:
+
+/root/motr2/cortx-motr/ha/failvec_xc.h:
+
+/root/motr2/cortx-motr/motr/keepalive_xc.h:
+
+/root/motr2/cortx-motr/conf/ha_xc.h:
+
+/root/motr2/cortx-motr/rpc/ha_xc.h:
+
+/root/motr2/cortx-motr/be/ha_xc.h:
+
+/root/motr2/cortx-motr/sns/cm/ha_xc.h:
+
+/root/motr2/cortx-motr/ha/msg_xc.h:
+
+/root/motr2/cortx-motr/ha/cookie.h:
+
+/root/motr2/cortx-motr/ha/link_fops_xc.h:
+
+/root/motr2/cortx-motr/ha/cookie_xc.h:
+
+/root/motr2/cortx-motr/ha/epoch.h:
+
+/usr/include/yaml.h:
+
+/root/motr2/cortx-motr/be/ut/helper.h:
+
+/root/motr2/cortx-motr/be/domain.h:
+
+/root/motr2/cortx-motr/be/engine.h:
+
+/root/motr2/cortx-motr/be/log.h:
+
+/root/motr2/cortx-motr/be/fmt.h:
+
+/root/motr2/cortx-motr/be/log_store.h:
+
+/root/motr2/cortx-motr/be/log_sched.h:
+
+/root/motr2/cortx-motr/be/io.h:
+
+/root/motr2/cortx-motr/be/io_sched.h:
+
+/root/motr2/cortx-motr/be/recovery.h:
+
+/root/motr2/cortx-motr/be/tx_group.h:
+
+/root/motr2/cortx-motr/be/tx_group_format.h:
+
+/root/motr2/cortx-motr/be/tx_group_fom.h:
+
+/root/motr2/cortx-motr/be/seg0.h:
+
+/root/motr2/cortx-motr/be/pd.h:
+
+/root/motr2/cortx-motr/be/pool.h:
+
+/root/motr2/cortx-motr/be/log_discard.h:
+
+/root/motr2/cortx-motr/pool/pool.h:
+
+/root/motr2/cortx-motr/lib/tlist_xc.h:
+
+/root/motr2/cortx-motr/fd/fd.h:
+
+/root/motr2/cortx-motr/pool/pool_machine.h:
+
+/root/motr2/cortx-motr/pool/pool_machine_xc.h:
+
+/root/motr2/cortx-motr/pool/policy.h:
+
+/root/motr2/cortx-motr/ha/ha.h:
+
+/root/motr2/cortx-motr/ha/entrypoint.h:
+
+/root/motr2/cortx-motr/motr/ha.h:
+
+/root/motr2/cortx-motr/ut/misc.h:
+
+/root/motr2/cortx-motr/ut/ut.h:

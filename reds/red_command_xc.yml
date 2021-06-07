@@ -1,0 +1,47 @@
+---
+- attribute:
+    xc_atype: M0_XA_RECORD
+    xc_domain: rpc
+  members:
+  - attribute: {}
+    name: fcr_disp
+    offset: 0
+    size: 8
+    type: uint8_t
+    xc_type: '&M0_XT_U8'
+  - attribute: {}
+    name: fcr_num1
+    offset: 32
+    size: 32
+    type: uint32_t
+    xc_type: '&M0_XT_U32'
+  - attribute: {}
+    name: fcr_num2
+    offset: 64
+    size: 32
+    type: uint32_t
+    xc_type: '&M0_XT_U32'
+  name: m0_red_command_req
+  scope: ''
+  size: 96
+  type: struct
+- attribute:
+    xc_atype: M0_XA_RECORD
+    xc_domain: rpc
+  members:
+  - attribute: {}
+    name: fcp_rc
+    offset: 0
+    size: 32
+    type: int32_t
+    xc_type: '&M0_XT_U32'
+  - attribute: {}
+    name: fcp_result
+    offset: 32
+    size: 32
+    type: int32_t
+    xc_type: '&M0_XT_U32'
+  name: m0_red_command_rep
+  scope: ''
+  size: 64
+  type: struct

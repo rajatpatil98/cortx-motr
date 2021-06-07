@@ -1,0 +1,3 @@
+ut_libmotr_ut_la_SOURCES += reds/ut/red_ut.c
+
+CONFXC_FILES += reds/ut/red.xc

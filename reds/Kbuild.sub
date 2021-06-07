@@ -1,0 +1,5 @@
+m0tr_objects += \
+                  reds/red_command_fom.o \
+                  reds/red_command_fops.o \
+                  reds/red_command_xc.o \
+                  reds/red_service.o

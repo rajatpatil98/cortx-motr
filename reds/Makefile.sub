@@ -1,0 +1,14 @@
+nobase_motr_include_HEADERS += reds/red_command.h \
+                               reds/red_command_fom.h \
+                               reds/red_command_fops.h \
+                               reds/red_service.h
+
+motr_libmotr_la_SOURCES += reds/red_command.c \
+                           reds/red_command_fom.c \
+                           reds/red_command_fops.c \
+                           reds/red_service.c
+
+nodist_motr_libmotr_la_SOURCES += reds/red_command_xc.c
+
+XC_FILES += reds/red_command_xc.h
+
