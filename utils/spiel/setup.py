@@ -17,7 +17,12 @@
 # please email opensource@seagate.com or cortx-questions@seagate.com.
 #
 
+from distutils.cmd import Command
+from distutils.errors import DistutilsError
+from distutils.log import ERROR, INFO
 from distutils.core import setup, Extension
+import setuptools
+from distutils.extension import Extension
 
 motr = Extension('motr',
                  define_macros=[('M0_INTERNAL', ''), ('M0_EXTERN', 'extern')],

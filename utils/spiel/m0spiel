@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 #
 # Copyright (c) 2020 Seagate Technology LLC and/or its Affiliates
 #
@@ -46,8 +46,8 @@ def address_get():
 
 default_libmotr_path = '../../motr/.libs/libmotr.so'
 addr = address_get()
-default_ha_ep = addr + ':12345:34:1001'
-default_client_ep = addr + ':12345:34:200'
+default_ha_ep = str(addr) + ':12345:34:1001'
+default_client_ep = str(addr) + ':12345:34:200'
 
 
 # Helper function to check the type of the function parameter. This is useful
@@ -72,9 +72,10 @@ default_client_ep = addr + ':12345:34:200'
 def require(**params):
     def check_types(func, params=params):
         def modified(*args, **kw):
-            arg_names = func.func_code.co_varnames
-            kw.update(zip(arg_names, args))
-            for name, type in params.iteritems():
+            arg_names = func.__code__.co_varnames
+            kw.update(list(zip(arg_names, args)))
+            for name, type in params.items():
+                name = str(name)
                 param = kw[name]
                 param_valid = param is None or isinstance(param, type)
                 if not param_valid:
@@ -86,7 +87,7 @@ def require(**params):
 
 
 # enum m0_conf_service_type
-service_types = range(1, 22)
+service_types = list(range(1, 22))
 M0_CST_MDS, M0_CST_IOS, M0_CST_CONFD, M0_CST_RMS, M0_CST_STATS, M0_CST_HA, \
     M0_CST_SSS, M0_CST_SNS_REP, M0_CST_SNS_REB, M0_CST_ADDB2, \
     M0_CST_CAS, M0_CST_DIX_REP, M0_CST_DIX_REB, M0_CST_DS1, \
@@ -95,7 +96,7 @@ M0_CST_MDS, M0_CST_IOS, M0_CST_CONFD, M0_CST_RMS, M0_CST_STATS, M0_CST_HA, \
 
 
 # enum m0_cfg_storage_device_interface_type
-storage_device_interface = range(1, 8)
+storage_device_interface = list(range(1, 8))
 M0_CFG_DEVICE_INTERFACE_ATA, M0_CFG_DEVICE_INTERFACE_SATA, \
     M0_CFG_DEVICE_INTERFACE_SCSI, M0_CFG_DEVICE_INTERFACE_SATA2, \
     M0_CFG_DEVICE_INTERFACE_SCSI2, M0_CFG_DEVICE_INTERFACE_SAS, \
@@ -103,13 +104,13 @@ M0_CFG_DEVICE_INTERFACE_ATA, M0_CFG_DEVICE_INTERFACE_SATA, \
 
 
 # enum m0_cfg_storage_device_media_type
-storage_device_media_type = range(1, 5)
+storage_device_media_type = list(range(1, 5))
 M0_CFG_DEVICE_MEDIA_DISK, M0_CFG_DEVICE_MEDIA_SSD, M0_CFG_DEVICE_MEDIA_TAPE, \
     M0_CFG_DEVICE_MEDIA_ROM = storage_device_media_type
 
 
 # enum m0_cm_status
-cm_status = range(5)
+cm_status = list(range(5))
 CM_STATUS_INVALID, CM_STATUS_IDLE, CM_STATUS_STARTED, \
     CM_STATUS_FAILED, CM_STATUS_PAUSED = cm_status
 
@@ -119,7 +120,7 @@ class Fid(Structure):
     _fields_ = [("f_container", c_uint64), ("f_key", c_uint64)]
 
     def __str__(self):
-        return "<" + hex(self.f_container)[:-1] + ":" + str(self.f_key) + ">"
+        return str("<" + str(hex(self.f_container)[:-1]) + ":" + str(self.f_key) + ">")
 
 
 spiel_rms_fid = Fid(0x7300000000000004, 100)
@@ -192,10 +193,13 @@ class SpielWrapper:
         self.motr.m0_alloc.restype = c_void_p
         self.signal_nr = None
         self.signal_cb = None
+        self.spiel = 0
 
     def spiel_init(self, client, ha):
-        self.client_ep = c_char_p(client or default_client_ep)
-        self.ha_ep = c_char_p(ha or default_ha_ep)
+        client = client or default_client_ep
+        ha = ha or default_ha_ep
+        self.client_ep = c_char_p(client.encode('ascii'))
+        self.ha_ep = c_char_p(ha.encode('ascii'))
         self.__m0_init()
         self.__net_domain_init()
         self.__net_buffer_pool_setup()
@@ -205,7 +209,8 @@ class SpielWrapper:
         self.__spiel_init()
 
     def spiel_fini(self):
-        self.motr.m0_spiel_fini(self.spiel)
+        if self.spiel:
+            self.motr.m0_spiel_fini(self.spiel)
         self.__free(self.spiel)
         self.motr.m0_sns_cm_repair_trigger_fop_fini()
         self.motr.m0_sns_cm_rebalance_trigger_fop_fini()
@@ -263,14 +268,14 @@ class SpielWrapper:
                                            mdredundancy, params_p)
 
     @require(spiel_tx=SpielTx, fid=Fid, memsize=int, nr_cpu=int,
-             last_state=long, flags=long)
+             last_state=int, flags=int)
     def node_add(self, spiel_tx, fid, memsize, nr_cpu, last_state, flags):
         return self.motr.m0_spiel_node_add(spiel_tx.data, byref(fid), memsize,
                                            nr_cpu, last_state, flags)
 
     @require(spiel_tx=SpielTx, fid=Fid, parent=Fid, cores=Bitmap,
-             memory_limit_as=long, memory_limit_rss=long,
-             memory_limit_stack=long, memory_limit_memlock=long, endpoint=str)
+             memory_limit_as=int, memory_limit_rss=int,
+             memory_limit_stack=int, memory_limit_memlock=int, endpoint=str)
     def process_add(self, spiel_tx, fid, parent, cores, memory_limit_as,
                     memory_limit_rss, memory_limit_stack,
                     memory_limit_memlock, endpoint):
@@ -296,8 +301,8 @@ class SpielWrapper:
                                               byref(parent), byref(svc_info))
 
     @require(spiel_tx=SpielTx, fid=Fid, parent=Fid, drive=Fid, dev_idx=int,
-             iface=int, media=int, bsize=int, size=long, last_state=long,
-             flags=long, filename=str)
+             iface=int, media=int, bsize=int, size=int, last_state=int,
+             flags=int, filename=str)
     def device_add(self, spiel_tx, fid, parent, drive, dev_idx, iface, media,
                    bsize, size, last_state, flags, filename):
         if iface not in storage_device_interface:
@@ -429,7 +434,9 @@ class SpielWrapper:
 
     @require(profile=str)
     def cmd_profile_set(self, profile):
-        return self.motr.m0_spiel_cmd_profile_set(self.spiel, profile)
+        profile="<0x700000000000000:77>"
+        profile_b = profile.encode('utf-8')    
+        return self.motr.m0_spiel_cmd_profile_set(self.spiel, c_char_p(profile_b))
 
     @require(fid=Fid)
     def service_init(self, fid):
@@ -731,7 +738,7 @@ if __name__ == "__main__":
        prompt = '> ' if sys.stdin.isatty() else ''
        while 1:
            try:
-               s = raw_input(prompt)
+               s = input()
                res = interpreter.push(s)
            except (EOFError, KeyboardInterrupt):
                break

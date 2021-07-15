@@ -1,0 +1,7 @@
+README
+motr.c
+setup.py
+motr.egg-info/PKG-INFO
+motr.egg-info/SOURCES.txt
+motr.egg-info/dependency_links.txt
+motr.egg-info/top_level.txt

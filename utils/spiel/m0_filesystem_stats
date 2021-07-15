@@ -188,7 +188,7 @@ get_ep_status()
 main()
 {
 	pid=$$
-	python2_path=$(get_bin_path python2)
+	python2_path=$(get_bin_path python3)
 	m0spiel_path=$(get_bin_path m0spiel)
 	check_bin_path python2
 	check_bin_path m0spiel

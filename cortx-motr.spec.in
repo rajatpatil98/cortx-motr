@@ -103,6 +103,7 @@ BuildRequires:  python-devel
 %else
 BuildRequires:  python2-devel
 %endif
+BuildRequires:  python36-pip
 BuildRequires:  libedit-devel
 BuildRequires:  isa-l
 %if %{with cassandra}
@@ -272,6 +273,7 @@ fi
 %{_sysconfdir}/security/limits.d/90-motr.conf
 /opt/seagate/cortx/motr/*
 /lib/modules/*/kernel/fs/motr/*
+/lib64/python3.6/site-packages/motr*
 %exclude %{_bindir}/m0gentestds
 %exclude %{_bindir}/m0gccxml2xcode
 %exclude %{_bindir}/m0kut*

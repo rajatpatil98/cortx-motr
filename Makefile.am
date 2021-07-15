@@ -135,8 +135,10 @@ KDIR = @LINUX_OBJ@
 
 # path for python C extention installs
 # TODO : port m0spiel utility to python3
-PYTHON      := python2
+PYTHON      := python3
+PY3_VERSION := 36
 SETUP_PY    := $(PYTHON) setup.py
+PIP         := pip3
 
 if MOTR_IDX_STORE_CASS
 # override is needed to allow user to provide some additional options in
@@ -1390,8 +1392,13 @@ else
 KERNEL_MODULES_BUILD =
 endif
 
+MERO_VER = 2.0
+SPL_WHL = dist/mero-$(MERO_VER)-cp$(PY3_VERSION)-cp$(PY3_VERSION)m-linux_x86_64.whl
+M0SPIEL_INSTALL_CMD = $(PIP) install --ignore-installed --prefix $(DESTDIR)/$(PREFIX) $(SPL_WHL)
+
 # this is executed just after 'all' target
 all-local: $(KERNEL_MODULES_BUILD) $(LTLIBRARIES) $(PROGRAMS)
+	@cd utils/spiel; $(SETUP_PY) bdist_wheel; $(M0SPIEL_INSTALL_CMD)
 	@$(top_srcdir)/scripts/build/check-sources $(top_srcdir)
 	@$(top_srcdir)/scripts/build/check-public-api
 	@$(top_srcdir)/scripts/build/check-protocol
