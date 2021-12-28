@@ -647,7 +647,7 @@ M0_INTERNAL bool m0__obj_is_parity_verify_mode(struct m0_client *instance)
 
 M0_INTERNAL bool m0__obj_is_di_enabled(struct m0_op_io *ioo)
 {
-	return ioo->ioo_obj->ob_entity.en_flags & M0_ENF_DI;
+	return ioo->ioo_attr.ov_vec.v_nr != 0;
 }
 
 M0_INTERNAL bool m0__obj_is_cksum_validation_allowed(struct m0_op_io *ioo)
