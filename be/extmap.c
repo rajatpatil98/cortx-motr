@@ -1010,6 +1010,7 @@ emap_it_pack(struct m0_be_emap_cursor *it,
 
 	/* Copy checksum array into emap record */
 	if (rec->er_cksum_nob ) {
+		M0_LOG(M0_ALWAYS,"POC : write path data %02x",((int *)ext->ee_cksum_buf.b_addr)[0]);
 		memcpy( (void *)&rec_buf_ptr->er_footer,
 				ext->ee_cksum_buf.b_addr, rec->er_cksum_nob );
 	}
@@ -1083,6 +1084,7 @@ static int emap_it_open(struct m0_be_emap_cursor *it)
 		ext->ee_cksum_buf.b_nob  = rec->er_cksum_nob;
 		ext->ee_cksum_buf.b_addr = rec->er_cksum_nob ?
 								 (void *)&rec->er_footer : NULL;
+		// M0_LOG(M0_ALWAYS,"rajat from storage : %02x",((int *)ext->ee_cksum_buf.b_addr)[0]);
 		it->ec_unit_size = rec->er_unit_size;
  		if (!emap_it_prefix_ok(it))
 			rc = -ESRCH;
