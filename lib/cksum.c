@@ -26,7 +26,129 @@
 #define M0_TRACE_SUBSYSTEM M0_TRACE_SUBSYS_LIB
 #include "lib/trace.h"
 
+#define m0_cksum_print(buf, seg, dbuf, msg) \
+do { \
+		struct m0_vec *vec = &(buf)->ov_vec; \
+		char *dst = (char *)(buf)->ov_buf[seg]; \
+		char *data = (char *)(dbuf)->ov_buf[seg]; \
+		M0_LOG(M0_DEBUG, msg " count[%d] = %"PRIu64 \
+			   " cksum = %c%c data = %c%c", \
+			   seg, vec->v_count[seg], dst[0], dst[1], data[0],data[1]); \
+}while(0)
 
+/**
+ * Calculate checksum/protection info for data/KV
+ *
+ * @param pi  pi struct m0_md5_pi
+ *            This function will calculate the checksum and set
+ *            pi_value field of struct m0_md5_pi.
+ * @param seed seed value (pis_obj_id+pis_data_unit_offset) required to calculate
+ *             the checksum. If this pointer is NULL that means either
+ *             this checksum calculation is meant for KV or user does
+ *             not want seeding.
+ * @param m0_bufvec - Set of buffers for which checksum is computed.
+ * @param flag if flag is M0_PI_CALC_UNIT_ZERO, it means this api is called for
+ *             first data unit and MD5_Init should be invoked.
+ */
+M0_INTERNAL int m0_calculate_md5( struct m0_md5_pi *pi,
+								  struct m0_pi_seed *seed,
+								  struct m0_bufvec *bvec,
+								  enum m0_pi_calc_flag flag )
+{
+#ifndef __KERNEL__
+	MD5_CTX context;
+	int i, rc;
+
+	M0_ENTRY();
+
+	M0_PRE(pi != NULL);
+	M0_PRE(ergo(bvec != NULL && bvec->ov_vec.v_nr != 0,
+				bvec != NULL && bvec->ov_vec.v_count != NULL &&
+				bvec->ov_buf != NULL));
+
+	pi->pimd5_hdr.pih_size = sizeof(struct m0_md5_pi)/M0_CKSUM_DATA_ROUNDOFF_BYTE;
+	if( M0_CKSUM_PAD_MD5 )
+		memset(pi->pimd5_pad,0,sizeof(pi->pimd5_pad));
+
+	/* This call is for first data unit, need to initialize prev_context */
+	if (flag & M0_PI_CALC_UNIT_ZERO) {
+		rc = MD5_Init(&context);
+		if (rc != 1) {
+			return M0_ERR_INFO(rc, "MD5_Init failed v_nr: %d",bvec->ov_vec.v_nr);
+		}
+	}
+
+	if (bvec != NULL) {
+		for (i = 0; i < bvec->ov_vec.v_nr; i++) {
+			rc = MD5_Update(&context, bvec->ov_buf[i],
+					bvec->ov_vec.v_count[i]);
+			if (rc != 1) {
+				return M0_ERR_INFO(rc, "MD5_Update failed."
+						"v_nr=%d, "
+						"bvec->ov_buf[%d]=%p, "
+						"bvec->ov_vec.v_count[%d]=%lu",
+						bvec->ov_vec.v_nr, i,
+						bvec->ov_buf[i], i,
+						bvec->ov_vec.v_count[i]);
+			}
+		}
+	}
+
+	if (seed != NULL) {
+		/*
+		 * seed_str have string represention for 3 uint64_t(8 bytes)
+		 * range for uint64_t is 0 to 18,446,744,073,709,551,615 at
+		 * max 20 chars per var, for three var it will be 3*20, +1 '\0'.
+		 * seed_str needs to be 61 bytes, round off and taking 64 bytes.
+		 */
+		char seed_str[64] = {'\0'};
+		snprintf(seed_str, sizeof(seed_str), "%" PRIx64 "%" PRIx64 "%"PRIx64,
+				seed->pis_obj_id.f_container, seed->pis_obj_id.f_key,
+				seed->pis_data_unit_offset);
+		rc = MD5_Update(&context, (unsigned char *)seed_str,
+				sizeof(seed_str));
+		if (rc != 1) {
+
+			return M0_ERR_INFO(rc, "MD5_Update fail =%d"
+					"f_container 0x%" PRIx64 " f_key 0x%"PRIx64
+					" data_unit_offset 0x%" PRIx64 " seed_str %s",
+					bvec->ov_vec.v_nr, seed->pis_obj_id.f_container,
+					seed->pis_obj_id.f_key,
+					seed->pis_data_unit_offset,
+					(char *)seed_str);
+		}
+	}
+
+	if (!(flag & M0_PI_SKIP_CALC_FINAL)) {
+		rc = MD5_Final(pi->pimd5_value, &context);
+		if (rc != 1) {
+			return M0_ERR_INFO(rc, "MD5_Final fail =%d",
+					bvec->ov_vec.v_nr);
+		}
+	}
+#endif
+	return  M0_RC(0);
+}
+
+/**
+ * Calculate checksum/protection info for data/KV
+ *
+ * @param pi  pi struct m0_md5_inc_context_pi
+ *            This function will calculate the checksum and set
+ *            pi_value field of struct m0_md5_inc_context_pi.
+ * @param seed seed value (pis_obj_id+pis_data_unit_offset) required to calculate
+ *             the checksum. If this pointer is NULL that means either
+ *             this checksum calculation is meant for KV or user does
+ *             not want seeding.
+ * @param m0_bufvec - Set of buffers for which checksum is computed.
+ * @param flag if flag is M0_PI_CALC_UNIT_ZERO, it means this api is called for
+ *             first data unit and MD5_Init should be invoked.
+ * @param[out] curr_context context of data unit N, will be required to calculate checksum for
+ *                         next data unit, N+1. Curre_context is calculated and set in this func.
+ * @param[out] pi_value_without_seed - Caller may need checksum value without seed and with seed.
+ *                                     With seed checksum is set in pi_value of PI type struct.
+ *                                     Without seed checksum is set in this field.
+ */
 M0_INTERNAL int m0_calculate_md5_inc_context(
 		struct m0_md5_inc_context_pi *pi,
 		struct m0_pi_seed *seed,
@@ -47,12 +169,15 @@ M0_INTERNAL int m0_calculate_md5_inc_context(
 				bvec != NULL && bvec->ov_vec.v_count != NULL &&
 				bvec->ov_buf != NULL));
 
+	pi->pimd5c_hdr.pih_size = sizeof(struct m0_md5_inc_context_pi)/M0_CKSUM_DATA_ROUNDOFF_BYTE;
+	if( M0_CKSUM_PAD_MD5_INC_CXT )
+		memset(pi->pi_md5c_pad,0,sizeof(pi->pi_md5c_pad));
+
 	/* This call is for first data unit, need to initialize prev_context */
 	if (flag & M0_PI_CALC_UNIT_ZERO) {
-		pi->pimd5c_hdr.pih_size = sizeof(struct m0_md5_inc_context_pi);
 		rc = MD5_Init((MD5_CTX *)&pi->pimd5c_prev_context);
 		if (rc != 1) {
-			return M0_ERR_INFO(rc, "MD5_Init failed.");
+			return M0_ERR_INFO(rc, "MD5_Init failed v_nr=%d",bvec->ov_vec.v_nr);
 		}
 	}
 
@@ -67,10 +192,10 @@ M0_INTERNAL int m0_calculate_md5_inc_context(
 					bvec->ov_vec.v_count[i]);
 			if (rc != 1) {
 				return M0_ERR_INFO(rc, "MD5_Update failed."
-						"curr_context=%p, "
+						"v_nr=%d, "
 						"bvec->ov_buf[%d]=%p, "
 						"bvec->ov_vec.v_count[%d]=%lu",
-						curr_context, i,
+						bvec->ov_vec.v_nr, i,
 						bvec->ov_buf[i], i,
 						bvec->ov_vec.v_count[i]);
 			}
@@ -93,8 +218,8 @@ M0_INTERNAL int m0_calculate_md5_inc_context(
 		if (rc != 1) {
 			return M0_ERR_INFO(rc, "MD5_Final failed"
 					"pi_value_without_seed=%p"
-					"curr_context=%p",
-					pi_value_without_seed, curr_context);
+					"v_nr=%d",
+					pi_value_without_seed, bvec->ov_vec.v_nr);
 		}
 	}
 
@@ -122,10 +247,10 @@ M0_INTERNAL int m0_calculate_md5_inc_context(
 				sizeof(seed_str));
 		if (rc != 1) {
 
-			return M0_ERR_INFO(rc, "MD5_Update fail curr_context=%p"
+			return M0_ERR_INFO(rc, "MD5_Update fail v_nr=%d"
 					"f_container 0x%" PRIx64 " f_key 0x%"PRIx64
 					" data_unit_offset 0x%" PRIx64 " seed_str %s",
-					curr_context, seed->pis_obj_id.f_container,
+					bvec->ov_vec.v_nr, seed->pis_obj_id.f_container,
 					seed->pis_obj_id.f_key,
 					seed->pis_data_unit_offset,
 					(char *)seed_str);
@@ -135,31 +260,33 @@ M0_INTERNAL int m0_calculate_md5_inc_context(
 	if (!(flag & M0_PI_SKIP_CALC_FINAL)) {
 		rc = MD5_Final(pi->pimd5c_value, &context);
 		if (rc != 1) {
-			return M0_ERR_INFO(rc, "MD5_Final fail curr_context=%p",
-					curr_context);
+			return M0_ERR_INFO(rc, "MD5_Final fail v_nr=%d",
+							   bvec->ov_vec.v_nr);
 		}
 	}
 #endif
 	return  M0_RC(0);
 }
 
-M0_INTERNAL uint64_t m0_calculate_cksum_size(struct m0_generic_pi *pi)
+M0_INTERNAL uint32_t m0_cksum_get_size(enum m0_pi_algo_type pi_type)
 {
 	M0_ENTRY();
 #ifndef __KERNEL__
-	switch (pi->pi_hdr.pih_type) {
+	switch (pi_type) {
 	case M0_PI_TYPE_MD5_INC_CONTEXT:
 		return sizeof(struct m0_md5_inc_context_pi);
 		break;
 	case M0_PI_TYPE_MD5:
 		return sizeof(struct m0_md5_pi);
 		break;
+	default:
+		break;
 	}
 #endif
 	return 0;
 }
 
-M0_INTERNAL uint64_t max_cksum_size(void)
+M0_INTERNAL uint32_t m0_cksum_get_max_size(void)
 {
 	return (sizeof(struct m0_md5_pi) > sizeof(struct m0_md5_inc_context_pi) ?
 			sizeof(struct m0_md5_pi) : sizeof(struct m0_md5_inc_context_pi));
@@ -176,6 +303,12 @@ int m0_client_calculate_pi(struct m0_generic_pi *pi,
 	M0_ENTRY();
 #ifndef __KERNEL__
 	switch (pi->pi_hdr.pih_type) {
+	case M0_PI_TYPE_MD5: {
+		struct m0_md5_pi *md5_pi =
+			(struct m0_md5_pi *) pi;
+		rc = m0_calculate_md5(md5_pi, seed, bvec, flag);
+		}
+		break;
 	case M0_PI_TYPE_MD5_INC_CONTEXT: {
 		struct m0_md5_inc_context_pi *md5_context_pi =
 			(struct m0_md5_inc_context_pi *) pi;
