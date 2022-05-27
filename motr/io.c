@@ -659,16 +659,19 @@ M0_INTERNAL bool m0__obj_is_parity_verify_mode(struct m0_client *instance)
 
 M0_INTERNAL bool m0__obj_is_di_cksum_gen_enabled(struct m0_op_io *ioo)
 {
+	ioo->ioo_obj->ob_entity.en_flags |= M0_ENF_GEN_DI;
 	return ioo->ioo_obj->ob_entity.en_flags & M0_ENF_GEN_DI;
 }
 
 M0_INTERNAL bool  m0__obj_is_di_enabled(struct m0_op_io *ioo)
 {
+	ioo->ioo_obj->ob_entity.en_flags |= M0_ENF_GEN_DI;
 	return ioo->ioo_obj->ob_entity.en_flags & (M0_ENF_DI | M0_ENF_GEN_DI);
 }
 
 M0_INTERNAL uint8_t m0__obj_di_cksum_type(struct m0_op_io *ioo)
 {
+	ioo->ioo_obj->ob_entity.en_flags |= M0_ENF_GEN_DI;
 	struct m0_generic_pi *pi;
 
     if(ioo->ioo_obj->ob_entity.en_flags & M0_ENF_GEN_DI)
@@ -684,6 +687,7 @@ M0_INTERNAL uint8_t m0__obj_di_cksum_type(struct m0_op_io *ioo)
 
 M0_INTERNAL uint32_t m0__obj_di_cksum_size(struct m0_op_io *ioo)
 {
+	ioo->ioo_obj->ob_entity.en_flags |= M0_ENF_GEN_DI;
 	if(ioo->ioo_obj->ob_entity.en_flags & M0_ENF_GEN_DI)
 		return m0_cksum_get_size(M0_CKSUM_DEFAULT_PI);
 	else if( (ioo->ioo_obj->ob_entity.en_flags & M0_ENF_DI) &&
