@@ -30,6 +30,7 @@
 #include "lib/errno.h"                /* ENOMEM */
 #include "lib/atomic.h"               /* m0_atomic_{inc,dec,get} */
 #include "lib/cksum_utils.h"
+#include "lib/cksum_data.h"
 #include "rpc/rpc_machine_internal.h" /* m0_rpc_machine_lock */
 #include "fop/fom_generic.h"          /* m0_rpc_item_generic_reply_rc */
 #include "cob/cob.h"                  /* M0_COB_IO M0_COB_PVER M0_COB_NLINK */
@@ -177,12 +178,26 @@ static int application_checksum_process(struct m0_op_io *ioo,
 	if (compute_cs_buf == NULL )
 		return -ENOMEM;
 
-	M0_LOG(M0_DEBUG,"RECEIVED CS b_nob: %d PiTyp:%d",(int)rw_rep_cs_data->b_nob,cksum_type);
+	M0_LOG(M0_ALWAYS,"RECEIVED CS b_nob: %d PiTyp:%d",(int)rw_rep_cs_data->b_nob,cksum_type);
 
 	for (idx = 0; idx < num_units; idx++) {
 		struct fop_cksum_idx_data *cs_idx =
 						&cs_data->cd_idx[idx];
 		M0_ASSERT(cs_idx->ci_pg_idx != UINT32_MAX && cs_idx->ci_unit_idx != UINT32_MAX);
+
+		/* If user has passed checksum and Context is included as part of DI then
+		 * previous context be set correctly for current computation.
+		 */
+		if(m0__obj_is_di_cksum_input_enabled(ioo) &&
+			(cksum_type == M0_PI_TYPE_MD5_INC_CONTEXT)) {
+			struct m0_md5_inc_context_pi *pi_ctx_dst = compute_cs_buf;
+			struct m0_md5_inc_context_pi *pi_ctx_src = rw_rep_cs_data->b_addr + cs_compared;
+
+			/* Copy previous context stored */
+			memcpy( pi_ctx_dst->pimd5c_prev_context,
+					pi_ctx_src->pimd5c_prev_context,
+					sizeof(pi_ctx_dst->pimd5c_prev_context));
+		}
 
 		/* Calculate checksum for each unit */
 		rc = target_calculate_checksum(ioo, cksum_type, irfop->irf_pattr, cs_idx,
@@ -212,6 +227,7 @@ static int application_checksum_process(struct m0_op_io *ioo,
 					cs_idx->ci_unit_idx);
 			print_pi(rw_rep_cs_data->b_addr, rw_rep_cs_data->b_nob);
 			print_pi(compute_cs_buf, cksum_size);
+			M0_ASSERT(0);
 		}
 		/* Copy checksum to application buffer */
 		if (!m0__obj_is_di_cksum_gen_enabled(ioo) &&

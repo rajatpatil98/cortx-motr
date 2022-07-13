@@ -122,7 +122,7 @@ write_and_update()
 	local update_count=$2
 
 	echo "m0cp"
-	$motr_st_util_dir/m0cp -G $MOTR_PARAMS -o $object_id $src_file \
+	$motr_st_util_dir/m0cp -I $MOTR_PARAMS -o $object_id $src_file \
                                 -s $block_size -c $block_count -L $LID || {
 		error_handling $? "Failed to copy object"
 		break
@@ -137,14 +137,14 @@ write_and_update()
 		}
 	fi
 	echo "m0cp update"
-	$motr_st_util_dir/m0cp $MOTR_PARAMS -o $object_id $update_file \
+	$motr_st_util_dir/m0cp -I $MOTR_PARAMS -o $object_id $update_file \
                                  -s $block_size -c $update_count -L $LID \
                                  -u -O $update_offset|| {
 		error_handling $? "Failed to copy object"
 		break
 	}
 	echo "m0cat"
-	$motr_st_util_dir/m0cat -G $MOTR_PARAMS -o $object_id -s $block_size \
+	$motr_st_util_dir/m0cat -I $MOTR_PARAMS -o $object_id -s $block_size \
                                   -c $block_count -L $LID \
                                   $dest_file'_'$LID || {
 		error_handling $? "Failed to read object"

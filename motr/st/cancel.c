@@ -141,7 +141,7 @@ static void m0_write_cancel(void)
 		memset(data.ov_buf[i], 'A', blk_size);
 
 	/* Prepare indexvec for write */
-	rc = m0_bufvec_alloc(&attr, blk_cnt, 1);
+	rc = m0_bufvec_alloc(&attr, blk_cnt, m0_cksum_get_size(M0_ST_DI_TYP));
 	ST_ASSERT_FATAL(rc == 0);
 	rc = m0_indexvec_alloc(&ext, blk_cnt);
 	ST_ASSERT_FATAL(rc == 0);
@@ -164,7 +164,7 @@ static void m0_write_cancel(void)
 		st_entity_open(&objs[i].ob_entity);
 		/* Create the write request */
 		st_obj_op(&objs[i], M0_OC_WRITE, &ext, &data,
-			  NULL, 0, 0, &ops[i]);
+			  &attr, 0, 0, &ops[i]);
 	}
 	/*
 	 * Launch the write request for half of the objects and

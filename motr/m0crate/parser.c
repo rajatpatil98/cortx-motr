@@ -59,6 +59,7 @@ enum config_key_val {
 	IS_SKIP_LAYOUT,
 	IS_CROW_DISABLE,
 	LOG_LEVEL,
+	DI,
 	/*
 	 * All parameters below are workload-specific,
 	 * anything else should be added above this point.
@@ -164,6 +165,7 @@ struct key_lookup_table lookuptable[] = {
 	{"IS_SKIP_LAYOUT", IS_SKIP_LAYOUT},
 	{"IS_CROW_DISABLE", IS_CROW_DISABLE},
 	{"NR_ROUNDS", NR_ROUNDS},
+	{"DI", DI},
 };
 
 #define NKEYS (sizeof(lookuptable)/sizeof(struct key_lookup_table))
@@ -340,6 +342,14 @@ int copy_value(struct workload *load, int max_workload, int *index,
 			break;
 		case ADDB_INIT:
 			conf->is_addb_init = atoi(value);
+			break;
+		case DI:
+			if (atoi(value) == 1)
+				conf->di_flag = M0_ENF_DI;
+			else if (atoi(value) == 2)
+				conf->di_flag = M0_ENF_GEN_DI;
+			else
+				conf->di_flag = 0;
 			break;
 		case ADDB_SIZE:
 			conf->addb_size = getnum(value, "addb size");

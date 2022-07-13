@@ -657,6 +657,11 @@ M0_INTERNAL bool m0__obj_is_parity_verify_mode(struct m0_client *instance)
         return instance->m0c_config->mc_is_read_verify;
 }
 
+M0_INTERNAL bool m0__obj_is_di_cksum_input_enabled(struct m0_op_io *ioo)
+{
+	return ioo->ioo_obj->ob_entity.en_flags & M0_ENF_DI;
+}
+
 M0_INTERNAL bool m0__obj_is_di_cksum_gen_enabled(struct m0_op_io *ioo)
 {
 	return ioo->ioo_obj->ob_entity.en_flags & M0_ENF_GEN_DI;

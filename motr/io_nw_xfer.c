@@ -783,6 +783,23 @@ static void *buf_aux_chk_get(struct m0_bufvec *aux, enum page_attr p_attr,
 		aux->ov_buf[seg_idx] != NULL) ? aux->ov_buf[seg_idx] : NULL;
 }
 
+static uint64_t target_get_pg_array_idx(struct m0_op_io *ioo, uint64_t pg_idx)
+{
+	uint64_t i;
+	uint64_t pg_idx_abs;
+
+	pg_idx_abs = pg_idx + ioo->ioo_iomaps[0]->pi_grpid;
+	if (pg_idx < ioo->ioo_iomap_nr &&
+	    ioo->ioo_iomaps[pg_idx]->pi_grpid == pg_idx_abs)
+		return pg_idx;
+	for (i = 0; i < ioo->ioo_iomap_nr; i++) {
+		if (ioo->ioo_iomaps[i]->pi_grpid == pg_idx_abs)
+			return i;
+	}
+	/* Parity group id not found in an array so there is some bug */
+	M0_ASSERT(0);
+}
+
 /* This function will compute parity checksum in chksm_buf all other
  * parameter is input parameter
  */
@@ -808,19 +825,26 @@ int target_calculate_checksum(struct m0_op_io *ioo,
 	struct m0_buf              *buf;
 	struct m0_buf              *buf_seq;
 
-	M0_ASSERT(cs_idx->ci_pg_idx < ioo->ioo_iomap_nr);
-
 	pi = (struct m0_generic_pi *)chksm_buf;
-	map = ioo->ioo_iomaps[cs_idx->ci_pg_idx];
+	map = ioo->ioo_iomaps[target_get_pg_array_idx(ioo, cs_idx->ci_pg_idx)];
 	play = pdlayout_get(map->pi_ioo);
 	obj = map->pi_ioo->ioo_obj;
 
 	pi->pi_hdr.pih_type = pi_type;
 	flag = M0_PI_CALC_UNIT_ZERO;
+
 	seed.pis_data_unit_offset = ((cs_idx->ci_pg_idx + ioo->ioo_iomaps[0]->pi_grpid) * layout_n(play)) +
 				      cs_idx->ci_unit_idx;
 	seed.pis_obj_id.f_container = ioo->ioo_obj->ob_entity.en_id.u_hi;
 	seed.pis_obj_id.f_key = ioo->ioo_obj->ob_entity.en_id.u_lo;
+
+	/* If user has passed checksum and Context is included as part of DI then 
+	 * flag should be set correctly for avoid Context from getting initialized
+	 */
+	if(m0__obj_is_di_cksum_input_enabled(ioo) &&
+	   (pi_type == M0_PI_TYPE_MD5_INC_CONTEXT) &&
+	   (seed.pis_data_unit_offset != 0))
+		flag = M0_PI_NO_FLAG;
 
 	/* Select data pointer */
 	if (filter == PA_PARITY) {
@@ -860,7 +884,7 @@ int target_calculate_checksum(struct m0_op_io *ioo,
 		}
 	}
 
-	M0_LOG(M0_DEBUG,"COMPUTE CKSUM Typ:%d Sz:%d UTyp:[%s] [PG Idx:%" PRIu64 "][Unit Idx:%"PRIu64"] TotalRowNum:%d ActualRowNum:%d",
+	M0_LOG(M0_ALWAYS,"COMPUTE CKSUM Typ:%d Sz:%d UTyp:[%s] [PG Idx:%" PRIu64 "][Unit Idx:%"PRIu64"] TotalRowNum:%d ActualRowNum:%d",
 			(int)pi_type, m0_cksum_get_size(pi_type),
 			(filter == PA_PARITY) ? "P":"D",
 			(cs_idx->ci_pg_idx + ioo->ioo_iomaps[0]->pi_grpid),
@@ -870,6 +894,19 @@ int target_calculate_checksum(struct m0_op_io *ioo,
 	rc = m0_client_calculate_pi( pi, &seed, &bvec, flag, context, NULL);
 	m0_bufvec_free2(&bvec);
 	return rc;
+}
+
+static void print_pi_write(void *pi,int size)
+{
+	int i;
+	char arr[size * 3];
+	char *ptr = pi;
+	M0_LOG(M0_WARN,">>>>>>>>>>>>>>>>>>[PI Values]<<<<<<<<<<<<<<<<<");
+	for (i = 0; i < size; i++)
+	{
+		sprintf(&arr[i*3],"%02x ",ptr[i] & 0xff);
+	}
+	M0_LOG(M0_WARN,"%s ",(char *)arr);
 }
 
 static int target_ioreq_prepare_checksum(struct m0_op_io *ioo,
@@ -925,9 +962,20 @@ static int target_ioreq_prepare_checksum(struct m0_op_io *ioo,
 
 			unit_off = cs_idx_data->ci_pg_idx * layout_n(play) +
 				   cs_idx_data->ci_unit_idx;
-			M0_ASSERT(unit_off < ioo->ioo_attr.ov_vec.v_nr);
-			memcpy(rw_fop->crw_di_data_cksum.b_addr + computed_cksm_nob,
-			       ioo->ioo_attr.ov_buf[unit_off], cksum_size);
+
+			if (unit_off < ioo->ioo_attr.ov_vec.v_nr) {
+				memcpy(rw_fop->crw_di_data_cksum.b_addr +
+				       computed_cksm_nob,
+				       ioo->ioo_attr.ov_buf[unit_off], cksum_size);
+				print_pi_write(ioo->ioo_attr.ov_buf[unit_off], cksum_size);
+			}
+
+			M0_LOG(M0_ALWAYS,"COPIED CKSUM Sts:%d Typ:%d Sz:%d UTyp:[%s] [PG Idx:%" PRIu64 "][Unit Idx:%"PRIu64"]",
+			unit_off < ioo->ioo_attr.ov_vec.v_nr,
+			(int)cksum_type, m0_cksum_get_size(cksum_type),
+			(irfop->irf_pattr == PA_PARITY) ? "P":"D",
+			(cs_idx_data->ci_pg_idx + ioo->ioo_iomaps[0]->pi_grpid),
+			cs_idx_data->ci_unit_idx);
 		}
 
 		computed_cksm_nob += cksum_size;
@@ -963,7 +1011,7 @@ static void target_ioreq_calculate_index(struct m0_op_io *ioo,
 		fop_cs_data->cd_num_units++;
 		M0_ASSERT( fop_cs_data->cd_num_units <= fop_cs_data->cd_max_units);
 
-		M0_LOG(M0_DEBUG,"FOP Unit Added Num:%d GOF:%"PRIi64 " [PG Idx:%" PRIu64 "][Unit Idx:%" PRIu64 "] Seg:%d",
+		M0_LOG(M0_ALWAYS,"FOP Unit Added Num:%d GOF:%"PRIi64 " [PG Idx:%" PRIu64 "][Unit Idx:%" PRIu64 "] Seg:%d",
 				fop_cs_data->cd_num_units, goff,
 				cs_idx->ci_pg_idx + pgdata->pi_grpid,
 				cs_idx->ci_unit_idx, seg);
@@ -1104,7 +1152,7 @@ static int target_ioreq_iofops_prepare(struct target_ioreq *ti,
 		/* Need to update PG & Unit index for every seg_per_unit */
 		pgdata.seg_per_unit = layout_unit_size(pdlayout_get(ioo))/seg_sz;
 
-		M0_LOG(M0_DEBUG,"RIW=%d PGStartOff:%"PRIu64" GOFF-IOVEC StIdx: %"PRIi64 " EndIdx: %"PRIi64 " Vnr: %"PRIi32
+		M0_LOG(M0_ALWAYS,"RIW=%d PGStartOff:%"PRIu64" GOFF-IOVEC StIdx: %"PRIi64 " EndIdx: %"PRIi64 " Vnr: %"PRIi32
 				" Count0: %"PRIi64 " CountEnd: %"PRIi64,
 				(int)read_in_write, pgdata.pgrp0_index,
 				ti->ti_goff_ivec.iv_index[0],
@@ -1324,7 +1372,7 @@ static int target_ioreq_iofops_prepare(struct target_ioreq *ti,
 		rw_fop->crw_di_data_cksum.b_nob = 0;
 		rw_fop->crw_cksum_size = 0;
 
-		M0_LOG(M0_DEBUG, "FopNum = %d UnitSz: %d FopSz: %d Segment = %d",
+		M0_LOG(M0_ALWAYS, "FopNum = %d UnitSz: %d FopSz: %d Segment = %d",
 		       num_fops, pgdata.unit_sz, sz_added_to_fop, seg);
 
 		di_enabled = di_enabled && irfop->irf_cksum_data.cd_num_units;
@@ -1348,7 +1396,7 @@ static int target_ioreq_iofops_prepare(struct target_ioreq *ti,
 		    !read_in_write) {
 			/* Server side expects this to be valid if checksum is to be read */
 			rw_fop->crw_cksum_size = m0__obj_di_cksum_size(ioo);
-			M0_LOG(M0_DEBUG,"Read FOP enabling checksum");
+			M0_LOG(M0_ALWAYS,"Read FOP enabling checksum");
 		}
 
 		if (ioo->ioo_flags & M0_OOF_SYNC)

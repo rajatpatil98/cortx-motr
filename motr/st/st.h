@@ -28,12 +28,16 @@
 #include "motr/client.h"
 #include "motr/client_internal.h"
 #include "module/instance.h"
+#include "lib/cksum.h"
 
 #ifdef __KERNEL__
 #include <asm-generic/errno-base.h>
 #else
 #include <errno.h>
 #endif
+
+/** Default DI selection for ST */
+#define M0_ST_DI_TYP (M0_PI_TYPE_MD5_INC_CONTEXT)
 
 /**
  * @defgroup Client ST framework

@@ -975,6 +975,7 @@ M0_INTERNAL void m0__obj_attr_set(struct m0_obj *obj,
 M0_INTERNAL bool
 m0__obj_pool_version_is_valid(const struct m0_obj *obj);
 M0_INTERNAL bool m0__obj_is_parity_verify_mode(struct m0_client *instance);
+M0_INTERNAL bool m0__obj_is_di_cksum_input_enabled(struct m0_op_io *ioo);
 M0_INTERNAL bool m0__obj_is_di_cksum_gen_enabled(struct m0_op_io *ioo);
 M0_INTERNAL bool m0__obj_is_di_enabled(struct m0_op_io *ioo);
 M0_INTERNAL uint8_t m0__obj_di_cksum_type(struct m0_op_io *ioo);

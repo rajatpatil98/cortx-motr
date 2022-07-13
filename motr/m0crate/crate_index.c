@@ -1402,6 +1402,7 @@ static int create_index(struct m0_uint128 id)
 
 	/* Set an index creation operation. */
 	m0_idx_init(&idx, crate_uber_realm(), &id);
+	idx.in_entity.en_flags |= conf->di_flag;
 
 	if (conf->is_skip_layout)
 		conf->is_enf_meta = true;

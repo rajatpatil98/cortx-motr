@@ -91,6 +91,7 @@
 
 #include "lib/finject.h"
 #include "lib/trace.h"
+#include "lib/cksum_data.h"
 #include "motr/client.h"
 #include "motr/client_internal.h"
 #include "motr/idx.h"
@@ -99,6 +100,9 @@
 #include "motr/m0crate/workload.h"
 #include "motr/m0crate/crate_client.h"
 #include "motr/m0crate/crate_client_utils.h"
+#include "lib/cksum_utils.h"
+
+#define M0CRATE_IO_DI_TYP M0_PI_TYPE_MD5_INC_CONTEXT
 
 extern struct crate_conf *conf;
 
@@ -261,14 +265,27 @@ int cr_io_vector_prep(struct m0_workload_io *cwi,
 	struct m0_bufvec   *attr    = NULL;
 	struct m0_indexvec *index_vec = NULL;
 	struct m0_bitmap    segment_indices;
+	int                 num_unit_per_op;
+	int                 usz;
 
 	index_vec = m0_alloc(sizeof *index_vec);
-	attr = m0_alloc(sizeof *attr);
-	if (index_vec == NULL || attr == NULL)
+	if (index_vec == NULL)
 		goto enomem;
 
-	rc = m0_indexvec_alloc(index_vec, cwi->cwi_bcount_per_op) ?:
-	     m0_bufvec_alloc(attr, cwi->cwi_bcount_per_op, 1);
+	usz = m0_obj_layout_id_to_unit_size(op_ctx->coc_cwi->cwi_layout_id);
+	num_unit_per_op = (cwi->cwi_bcount_per_op * cwi->cwi_bs)/usz;
+	if (num_unit_per_op) {
+		attr = m0_alloc(sizeof *attr);
+		rc = m0_bufvec_alloc(attr, num_unit_per_op,
+					 m0_cksum_get_size(M0CRATE_IO_DI_TYP) );
+		if (rc != 0)
+			goto enomem;
+		op_ctx->coc_attr = attr;
+	} else
+		op_ctx->coc_attr = NULL;
+
+	rc = m0_indexvec_alloc(index_vec, cwi->cwi_bcount_per_op);
+
 	if (rc != 0)
 		goto enomem;
 	/*
@@ -323,17 +340,14 @@ int cr_io_vector_prep(struct m0_workload_io *cwi,
 	m0_bitmap_fini(&segment_indices);
 	op_ctx->coc_buf_vec = buf_vec;
 	op_ctx->coc_index_vec = index_vec;
-	/* TODO: set attr to NULL to disable cksum,
-	 * enable after addding cksum in ST
-	 */
-	op_ctx->coc_attr = NULL;
 
 	return 0;
 enomem:
 	if (index_vec != NULL)
 		m0_indexvec_free(index_vec);
 	m0_bufvec_free(buf_vec);
-	m0_free(attr);
+	if (attr != NULL)
+		m0_free(attr);
 	m0_free(index_vec);
 	m0_free(buf_vec);
 	return -ENOMEM;
@@ -355,6 +369,7 @@ int cr_namei_create(struct m0_workload_io *cwi,
 		    int                    obj_idx,
 		    int                    op_index)
 {
+	obj->ob_entity.en_flags |= conf->di_flag;
 	return m0_entity_create(check_fid(&cwi->cwi_pool_id),
 				&obj->ob_entity, &cti->cti_ops[free_slot]);
 }
@@ -375,6 +390,7 @@ int cr_namei_open(struct m0_workload_io *cwi,
 	M0_PRE(obj != NULL);
 	M0_SET0(obj);
 	m0_obj_init(obj, crate_uber_realm(), id, cwi->cwi_layout_id);
+	obj->ob_entity.en_flags |= conf->di_flag;
 	return m0_entity_open(&obj->ob_entity, &cti->cti_ops[free_slot]);
 }
 
@@ -406,6 +422,16 @@ int cr_io_write(struct m0_workload_io *cwi,
 	rc = cr_io_vector_prep(cwi, cti, op_ctx, obj_idx, op_index);
 	if (rc != 0)
 		return rc;
+	/* No attribute struct allocated so disable user generated DI from flag */
+	if (op_ctx->coc_attr == NULL)
+		obj->ob_entity.en_flags &= ~M0_ENF_DI;
+	else if (obj->ob_entity.en_flags & M0_ENF_DI)
+		m0_prepare_checksum(M0_PI_TYPE_MD5_INC_CONTEXT,
+				    obj->ob_entity.en_id, op_ctx->coc_index_vec,
+				    op_ctx->coc_buf_vec,
+				    op_ctx->coc_attr,
+				    m0_obj_layout_id_to_unit_size(
+				    m0__obj_lid(obj)));
 	rc = m0_obj_op(obj, M0_OC_WRITE,
 		       op_ctx->coc_index_vec, op_ctx->coc_buf_vec,
 		       op_ctx->coc_attr, 0, 0, &cti->cti_ops[free_slot]);
@@ -429,6 +455,8 @@ int cr_io_read(struct m0_workload_io *cwi,
 	rc = cr_io_vector_prep(cwi, cti, op_ctx, obj_idx, op_index);
 	if (rc != 0)
 		return rc;
+	else if (op_ctx->coc_attr == NULL)
+		obj->ob_entity.en_flags &= ~M0_ENF_DI;
 	rc = m0_obj_op(obj, M0_OC_READ,
 		       op_ctx->coc_index_vec, op_ctx->coc_buf_vec,
 		       op_ctx->coc_attr, 0, 0, &cti->cti_ops[free_slot]);

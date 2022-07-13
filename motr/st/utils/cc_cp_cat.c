@@ -137,7 +137,7 @@ int main(int argc, char **argv)
 				{"help",         no_argument,       NULL, 'h'},
 				{0,              0,                 0,     0 }};
 
-	while ((c = getopt_long(argc, argv, ":l:H:p:P:o:W:R:s:c:rh", l_opts,
+	while ((c = getopt_long(argc, argv, ":l:H:p:P:o:W:R:s:c:rhGI", l_opts,
 		       &option_index)) != -1) {
 		switch (c) {
 			case 'l': conf.mc_local_addr = optarg;

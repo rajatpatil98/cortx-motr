@@ -36,6 +36,9 @@
 #include "motr/st/utils/helper.h"
 #include "lib/getopts.h"
 #include "motr/client_internal.h"
+#include "lib/cksum.h"
+#include "lib/cksum_data.h"
+#include "lib/cksum_utils.h"
 
 extern struct m0_addb_ctx m0_addb_ctx;
 
@@ -97,9 +100,10 @@ static inline uint32_t entity_sm_state(struct m0_obj *obj)
 
 static int alloc_vecs(struct m0_indexvec *ext, struct m0_bufvec *data,
 		      struct m0_bufvec *attr, uint32_t block_count,
-		      uint32_t block_size)
+		      uint32_t block_size, uint32_t usz)
 {
 	int      rc;
+	int      num_unit_per_op;
 
 	rc = m0_indexvec_alloc(ext, block_count);
 	if (rc != 0)
@@ -116,11 +120,19 @@ static int alloc_vecs(struct m0_indexvec *ext, struct m0_bufvec *data,
 		m0_indexvec_free(ext);
 		return rc;
 	}
-	rc = m0_bufvec_alloc(attr, block_count, 1);
-	if (rc != 0) {
-		m0_indexvec_free(ext);
-		m0_bufvec_free(data);
-		return rc;
+	num_unit_per_op = (block_count * block_size)/usz;
+	M0_LOG(M0_DEBUG,"NU : %d, BC : %d, BS : %d, US : %d", (int)num_unit_per_op,
+			(int)block_count,(int)block_size,(int)usz);
+	if (num_unit_per_op && attr) {
+		rc = m0_bufvec_alloc(attr, num_unit_per_op, m0_cksum_get_size(M0_PI_TYPE_MD5_INC_CONTEXT));
+		if (rc != 0) {
+			m0_indexvec_free(ext);
+			m0_bufvec_free(data);
+			return rc;
+		}
+	} else if (attr) {
+		memset(attr, 0, sizeof(*attr));
+		return M0_RC(-EINVAL);
 	}
 	return rc;
 }
@@ -136,21 +148,21 @@ static void prepare_ext_vecs(struct m0_indexvec *ext,
 		ext->iv_index[i] = *last_index;
 		ext->iv_vec.v_count[i] = block_size;
 		*last_index += block_size;
-
-		/* we don't want any attributes */
-		attr->ov_vec.v_count[i] = 0;
 	}
+
+	for (i = 0; i < attr->ov_vec.v_nr; i++)
+		attr->ov_vec.v_count[i] = m0_cksum_get_size(M0_PI_TYPE_MD5_INC_CONTEXT);
 }
 
 static int alloc_prepare_vecs(struct m0_indexvec *ext,
 			      struct m0_bufvec *data,
 			      struct m0_bufvec *attr,
 			      uint32_t block_count, uint32_t block_size,
-			      uint64_t *last_index)
+			      uint64_t *last_index, uint32_t usz)
 {
 	int      rc;
 
-	rc = alloc_vecs(ext, data, attr, block_count, block_size);
+	rc = alloc_vecs(ext, data, attr, block_count, block_size, usz);
 	if (rc == 0) {
 		prepare_ext_vecs(ext, attr, block_count,
 				 block_size, last_index);
@@ -287,11 +299,8 @@ static int write_data_to_object(struct m0_obj *obj,
 	int                  rc;
 	struct m0_op        *ops[1] = {NULL};
 
-	/* Create write operation
-	 * CKSUM_TODO: calculate cksum and pass in
-	 * attr instead of NULL
-	 */
-	rc = m0_obj_op(obj, M0_OC_WRITE, ext, data, NULL, 0, 0, &ops[0]);
+	rc = m0_obj_op(obj, M0_OC_WRITE, ext, data,
+				attr->ov_vec.v_nr ? attr : NULL, 0, 0, &ops[0]);
 	if (rc != 0)
 		return M0_ERR(rc);
 
@@ -412,7 +421,7 @@ int m0_write(struct m0_container *container, char *src,
 		}
 	}
 
-	rc = alloc_vecs(&ext, &data, &attr, blks_per_io, block_size);
+	rc = alloc_vecs(&ext, &data, &attr, blks_per_io, block_size, unit_size);
 	if (rc != 0)
 		goto cleanup;
 
@@ -422,7 +431,7 @@ int m0_write(struct m0_container *container, char *src,
 		if (bcount < blks_per_io) {
 			cleanup_vecs(&data, &attr, &ext);
 			rc = alloc_vecs(&ext, &data, &attr, bcount,
-					block_size);
+					block_size, unit_size);
 			if (rc != 0)
 				goto cleanup;
 		}
@@ -432,9 +441,14 @@ int m0_write(struct m0_container *container, char *src,
 		/* Read data from source file. */
 		rc = read_data_from_file(fp, &data);
 		M0_ASSERT(rc == bcount);
-
+		if (attr.ov_buf != NULL && (obj.ob_entity.en_flags & M0_ENF_DI))
+			m0_prepare_checksum(M0_PI_TYPE_MD5_INC_CONTEXT,
+					    obj.ob_entity.en_id, &ext, &data,
+					    &attr,
+					    m0_obj_layout_id_to_unit_size(
+					    m0__obj_lid(&obj)));
 		/* Copy data to the object*/
-		rc = write_data_to_object(&obj, &ext, &data, NULL);
+		rc = write_data_to_object(&obj, &ext, &data, &attr);
 		if (rc != 0) {
 			fprintf(stderr, "Writing to object failed!\n");
 			break;
@@ -463,7 +477,8 @@ static int read_data_from_object(struct m0_obj *obj,
 	struct m0_op        *ops[1] = {NULL};
 
 	/* Create read operation */
-	rc = m0_obj_op(obj, M0_OC_READ, ext, data, attr, 0, flags, &ops[0]);
+	rc = m0_obj_op(obj, M0_OC_READ, ext, data, attr->ov_vec.v_nr ? attr : NULL,
+				0, flags, &ops[0]);
 	if (rc != 0)
 		return M0_ERR(rc);
 
@@ -554,7 +569,7 @@ int m0_read(struct m0_container *container,
 			blks_per_io = sz_block_in_byte / block_size;
 		}
 	}
-	rc = alloc_vecs(&ext, &data, &attr, blks_per_io, block_size);
+	rc = alloc_vecs(&ext, &data, &attr, blks_per_io, block_size, unit_size);
 	if (rc != 0)
 		goto cleanup;
 	while (block_count > 0) {
@@ -564,7 +579,7 @@ int m0_read(struct m0_container *container,
 		if (bcount < blks_per_io) {
 			cleanup_vecs(&data, &attr, &ext);
 			rc = alloc_vecs(&ext, &data, &attr, bcount,
-					block_size);
+					block_size, unit_size);
 			if (rc != 0)
 				goto cleanup;
 		}
@@ -574,7 +589,7 @@ int m0_read(struct m0_container *container,
 		if (block_count == bcount)
 			flags |= M0_OOF_LAST;
 
-		rc = read_data_from_object(&obj, &ext, &data, NULL, flags);
+		rc = read_data_from_object(&obj, &ext, &data, &attr, flags);
 		if (rc != 0) {
 			fprintf(stderr, "Reading from object failed!\n");
 			break;
@@ -831,13 +846,20 @@ int m0_write_cc(struct m0_container *container,
 		bcount = (block_count > blks_per_io) ?
 			  blks_per_io : block_count;
 		rc = alloc_prepare_vecs(&ext, &data, &attr, bcount,
-					       block_size, &last_index);
+					       block_size, &last_index, unit_size);
 		if (rc != 0)
 			goto cleanup;
 
 		/* Read data from source file. */
 		rc = read_data_from_file(fp, &data);
 		M0_ASSERT(rc == bcount);
+		if (attr.ov_buf != NULL && (obj.ob_entity.en_flags & M0_ENF_DI))
+			rc = m0_prepare_checksum(M0_PI_TYPE_MD5_INC_CONTEXT,
+						 obj.ob_entity.en_id, &ext,
+						 &data, &attr,
+						 m0_obj_layout_id_to_unit_size(
+						 m0__obj_lid(&obj)));
+		M0_ASSERT(rc == 0);
 
 		/* Copy data to the object*/
 		rc = write_data_to_object(&obj, &ext, &data, &attr);
@@ -877,11 +899,8 @@ int m0_read_cc(struct m0_container *container,
 	FILE                         *fp = NULL;
 	struct m0_client             *instance;
 	struct m0_rm_lock_req  req;
+	uint32_t                      unit_size;
 
-	rc = alloc_prepare_vecs(&ext, &data, &attr, block_count,
-				       block_size, &last_index);
-	if (rc != 0)
-		return rc;
 	instance = container->co_realm.re_instance;
 
 	/* Read the requisite number of blocks from the entity */
@@ -890,6 +909,11 @@ int m0_read_cc(struct m0_container *container,
 			   m0_client_layout_id(instance));
 
 	obj.ob_entity.en_flags = entity_flags;
+	unit_size = m0_obj_layout_id_to_unit_size(obj.ob_attr.oa_layout_id);
+	rc = alloc_prepare_vecs(&ext, &data, &attr, block_count,
+				       block_size, &last_index, unit_size);
+	if (rc != 0)
+		return rc;
 	rc = m0_obj_lock_init(&obj);
 	if (rc != 0)
 		goto init_error;
@@ -905,7 +929,8 @@ int m0_read_cc(struct m0_container *container,
 	}
 
 	/* Create read operation */
-	rc = m0_obj_op(&obj, M0_OC_READ, &ext, &data, &attr, 0, 0, &ops[0]);
+	rc = m0_obj_op(&obj, M0_OC_READ, &ext, &data,
+				attr.ov_vec.v_nr ? &attr : NULL, 0, 0, &ops[0]);
 	if (rc != 0) {
 		m0_obj_lock_put(&req);
 		goto get_error;

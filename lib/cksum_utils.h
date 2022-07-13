@@ -61,6 +61,23 @@ M0_INTERNAL void * m0_extent_vec_get_checksum_addr(void *b_addr,
 						   m0_bindex_t unit_sz,
 						   m0_bcount_t cs_sz);
 
+/**
+ * This function prepares checksum and populates it in attr based on the data
+ * pi_type. Checksum is seeded with object id and extent offset.
+ * @param[IN] pi_type for preparing checksum.
+ * @param[IN] obj_id for checksum seeding.
+ * @param[IN] ext to iterate through courser and seed checksum computation.
+ * @param[IN] data on which checksum will be prepared.
+ * @param[OUT] attr buffer for returning checksum.
+ * @param[IN] usz unit size for an object.
+ */
+M0_INTERNAL int m0_prepare_checksum(uint8_t pi_type,
+				    struct m0_uint128 obj_id,
+				    struct m0_indexvec *ext,
+				    struct m0_bufvec *data,
+				    struct m0_bufvec *attr,
+				    uint64_t usz);
+
 #endif /* __MOTR_CKSUM_UTILS_H__ */
 
 /*
