@@ -1169,7 +1169,7 @@ static int target_ioreq_iofops_prepare(struct target_ioreq *ti,
 		pgdata.seg_per_unit = layout_unit_size(pdlayout_get(ioo))/seg_sz;
 		if (m0__obj_is_di_cksum_input_enabled(ioo)) {
 			ti->ti_unit_off = ioo->ioo_ext.iv_index[0] %
-					     pgdata.pgrp_size;
+					  (layout_n(play) * pgdata.unit_sz);
 			ti->ti_unit_off = ti->ti_unit_off / pgdata.unit_sz;
 
 		}

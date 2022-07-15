@@ -133,6 +133,13 @@ static int alloc_vecs(struct m0_indexvec *ext, struct m0_bufvec *data,
 			return rc;
 		}
 	} else if (attr) {
+		rc = m0_bufvec_alloc(attr, 1, m0_cksum_get_size(M0HELPER_IO_DI_TYP));
+		if (rc != 0) {
+			m0_indexvec_free(ext);
+			m0_bufvec_free(data);
+			return rc;
+		}
+	} else {
 		memset(attr, 0, sizeof(*attr));
 		return M0_RC(-EINVAL);
 	}
@@ -382,8 +389,10 @@ int m0_write(struct m0_container *container, char *src,
 
 	/* Open source file */
 	fp = fopen(src, "r");
-	if (fp == NULL)
+	if (fp == NULL) {
+		M0_ASSERT(0);
 		return -EPERM;
+	}
 	M0_SET0(&obj);
 	lock_ops = take_locks ? &lock_enabled_ops : &lock_disabled_ops;
 	instance = container->co_realm.re_instance;
@@ -391,11 +400,15 @@ int m0_write(struct m0_container *container, char *src,
 		    m0_client_layout_id(instance));
 	obj.ob_entity.en_flags = entity_flags;
 	rc = lock_ops->olo_lock_init(&obj);
-	if (rc != 0)
+	if (rc != 0) {
+		M0_ASSERT(0);
 		goto init_error;
+	}
 	rc = lock_ops->olo_write_lock_get_sync(&obj, &req);
-	if (rc != 0)
+	if (rc != 0) {
+		M0_ASSERT(0);
 		goto get_error;
+	}
 
 	if (update_mode)
 		rc = open_entity(&obj.ob_entity);
@@ -403,8 +416,10 @@ int m0_write(struct m0_container *container, char *src,
 		rc = create_object(&obj.ob_entity);
 		update_offset = 0;
 	}
-	if (entity_sm_state(&obj) != M0_ES_OPEN || rc != 0)
+	if (entity_sm_state(&obj) != M0_ES_OPEN || rc != 0) {
+		M0_ASSERT(0);
 		goto cleanup;
+	}
 
 	last_index = update_offset;
 
@@ -420,12 +435,16 @@ int m0_write(struct m0_container *container, char *src,
 		if (sz_block_in_byte > unit_size) {
 			sz_block_in_byte -= sz_block_in_byte % unit_size;
 			blks_per_io = sz_block_in_byte / block_size;
+		} else if (block_count * block_size >= unit_size) {
+			blks_per_io = unit_size / block_size;
 		}
 	}
 
 	rc = alloc_vecs(&ext, &data, &attr, blks_per_io, block_size, unit_size);
-	if (rc != 0)
+	if (rc != 0) {
+		M0_ASSERT(0);
 		goto cleanup;
+	}
 
 	while (block_count > 0) {
 		bcount = (block_count > blks_per_io)?
@@ -434,8 +453,10 @@ int m0_write(struct m0_container *container, char *src,
 			cleanup_vecs(&data, &attr, &ext);
 			rc = alloc_vecs(&ext, &data, &attr, bcount,
 					block_size, unit_size);
-			if (rc != 0)
+			if (rc != 0) {
+				M0_ASSERT(0);
 				goto cleanup;
+			}
 		}
 		prepare_ext_vecs(&ext, &attr, bcount,
 				 block_size, &last_index);
@@ -452,6 +473,7 @@ int m0_write(struct m0_container *container, char *src,
 		/* Copy data to the object*/
 		rc = write_data_to_object(&obj, &ext, &data, &attr);
 		if (rc != 0) {
+			M0_ASSERT(0);
 			fprintf(stderr, "Writing to object failed!\n");
 			break;
 		}
@@ -569,6 +591,8 @@ int m0_read(struct m0_container *container,
 		if (sz_block_in_byte > unit_size) {
 			sz_block_in_byte -= sz_block_in_byte % unit_size;
 			blks_per_io = sz_block_in_byte / block_size;
+		} else if (block_count * block_size >= unit_size) {
+			blks_per_io = unit_size / block_size;
 		}
 	}
 	rc = alloc_vecs(&ext, &data, &attr, blks_per_io, block_size, unit_size);
@@ -837,6 +861,8 @@ int m0_write_cc(struct m0_container *container,
 		if (sz_block_in_byte > unit_size) {
 			sz_block_in_byte -= sz_block_in_byte % unit_size;
 			blks_per_io = sz_block_in_byte / block_size;
+		} else if (block_count * block_size >= unit_size) {
+			blks_per_io = unit_size / block_size;
 		}
 	}
 	rc = create_object(&obj.ob_entity);

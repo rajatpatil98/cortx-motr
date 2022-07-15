@@ -123,6 +123,7 @@ int main(int argc, char **argv)
 					"use -u=start index.\n",
 					U128_P(&cp_param.cup_id), rc);
 		} else {
+			M0_ASSERT(0);
 			fprintf(stderr, "Object "U128X_F" write failed: rc=%d\n"
 					, U128_P(&cp_param.cup_id), rc);
 		}

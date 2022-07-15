@@ -17,6 +17,7 @@
 # For any questions about this software or licensing,
 # please email opensource@seagate.com or cortx-questions@seagate.com.
 #
+set -x
 
 
 motr_st_util_dir=$(dirname $(readlink -f $0))
@@ -137,7 +138,7 @@ write_and_update()
 		}
 	fi
 	echo "m0cp update"
-	$motr_st_util_dir/m0cp -I $MOTR_PARAMS -o $object_id $update_file \
+	$motr_st_util_dir/m0cp $MOTR_PARAMS -o $object_id $update_file \
                                  -s $block_size -c $update_count -L $LID \
                                  -u -O $update_offset|| {
 		error_handling $? "Failed to copy object"
