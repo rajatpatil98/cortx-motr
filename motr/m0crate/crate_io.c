@@ -102,7 +102,7 @@
 #include "motr/m0crate/crate_client_utils.h"
 #include "lib/cksum_utils.h"
 
-#define M0CRATE_IO_DI_TYP M0_PI_TYPE_MD5_INC_CONTEXT
+#define M0CRATE_IO_DI_TYP M0_PI_TYPE_MD5
 
 extern struct crate_conf *conf;
 
@@ -426,7 +426,7 @@ int cr_io_write(struct m0_workload_io *cwi,
 	if (op_ctx->coc_attr == NULL)
 		obj->ob_entity.en_flags &= ~M0_ENF_DI;
 	else if (obj->ob_entity.en_flags & M0_ENF_DI)
-		m0_prepare_checksum(M0_PI_TYPE_MD5_INC_CONTEXT,
+		m0_prepare_checksum(M0CRATE_IO_DI_TYP,
 				    obj->ob_entity.en_id, op_ctx->coc_index_vec,
 				    op_ctx->coc_buf_vec,
 				    op_ctx->coc_attr,

@@ -253,7 +253,7 @@ M0_INTERNAL int m0_prepare_checksum(uint8_t pi_type,
 			(int)pi_type, m0_cksum_get_size(pi_type),
 			(int)seed.pis_data_unit_offset);
 		memcpy(attr->ov_buf[attr_idx], &pi,
-		       sizeof(struct m0_md5_inc_context_pi));
+		       m0_cksum_get_size(pi_type));
 		attr_idx++;
 		M0_ASSERT(attr_idx <= attr->ov_vec.v_nr);
 		m0_ivec_cursor_move(&extcur, usz);

@@ -236,7 +236,7 @@ static int application_checksum_process(struct m0_op_io *ioo,
 			struct m0_pdclust_layout *play = pdlayout_get(ioo);
 
 			unit_off = cs_idx->ci_pg_idx * layout_n(play) +
-				   cs_idx->ci_unit_idx;
+				   cs_idx->ci_unit_idx - ti->ti_unit_off;
 			memcpy(ioo->ioo_attr.ov_buf[unit_off],
 			       rw_rep_cs_data->b_addr + cs_compared,
 			       cksum_size);

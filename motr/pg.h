@@ -838,6 +838,12 @@ struct target_ioreq {
 
 	/** Whether cob create request for spare or read/write request. */
 	enum target_ioreq_type         ti_req_type;
+
+	/**
+	 * Precomputed unit offset for the io request done at the time of
+	 * fop prepare to avoid computing for all data units.
+	 */
+	uint32_t                       ti_unit_off;
 };
 
 /**
@@ -847,8 +853,8 @@ struct fop_cksum_idx_gbl_data {
 	m0_bcount_t                  pgrp_size;
 	uint32_t                     pi_grpid;
 	m0_bcount_t                  pgrp0_index;
-	uint32_t                     unit_sz; 
-	uint32_t                     seg_per_unit; 
+	uint32_t                     unit_sz;
+	uint32_t                     seg_per_unit;
 };
 
 /**

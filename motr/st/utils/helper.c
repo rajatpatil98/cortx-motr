@@ -40,6 +40,8 @@
 #include "lib/cksum_data.h"
 #include "lib/cksum_utils.h"
 
+#define M0HELPER_IO_DI_TYP M0_PI_TYPE_MD5
+
 extern struct m0_addb_ctx m0_addb_ctx;
 
 static int noop_lock_init(struct m0_obj *obj)
@@ -124,7 +126,7 @@ static int alloc_vecs(struct m0_indexvec *ext, struct m0_bufvec *data,
 	M0_LOG(M0_DEBUG,"NU : %d, BC : %d, BS : %d, US : %d", (int)num_unit_per_op,
 			(int)block_count,(int)block_size,(int)usz);
 	if (num_unit_per_op && attr) {
-		rc = m0_bufvec_alloc(attr, num_unit_per_op, m0_cksum_get_size(M0_PI_TYPE_MD5_INC_CONTEXT));
+		rc = m0_bufvec_alloc(attr, num_unit_per_op, m0_cksum_get_size(M0HELPER_IO_DI_TYP));
 		if (rc != 0) {
 			m0_indexvec_free(ext);
 			m0_bufvec_free(data);
@@ -151,7 +153,7 @@ static void prepare_ext_vecs(struct m0_indexvec *ext,
 	}
 
 	for (i = 0; i < attr->ov_vec.v_nr; i++)
-		attr->ov_vec.v_count[i] = m0_cksum_get_size(M0_PI_TYPE_MD5_INC_CONTEXT);
+		attr->ov_vec.v_count[i] = m0_cksum_get_size(M0HELPER_IO_DI_TYP);
 }
 
 static int alloc_prepare_vecs(struct m0_indexvec *ext,
@@ -442,7 +444,7 @@ int m0_write(struct m0_container *container, char *src,
 		rc = read_data_from_file(fp, &data);
 		M0_ASSERT(rc == bcount);
 		if (attr.ov_buf != NULL && (obj.ob_entity.en_flags & M0_ENF_DI))
-			m0_prepare_checksum(M0_PI_TYPE_MD5_INC_CONTEXT,
+			m0_prepare_checksum(M0HELPER_IO_DI_TYP,
 					    obj.ob_entity.en_id, &ext, &data,
 					    &attr,
 					    m0_obj_layout_id_to_unit_size(
@@ -854,7 +856,7 @@ int m0_write_cc(struct m0_container *container,
 		rc = read_data_from_file(fp, &data);
 		M0_ASSERT(rc == bcount);
 		if (attr.ov_buf != NULL && (obj.ob_entity.en_flags & M0_ENF_DI))
-			rc = m0_prepare_checksum(M0_PI_TYPE_MD5_INC_CONTEXT,
+			rc = m0_prepare_checksum(M0HELPER_IO_DI_TYP,
 						 obj.ob_entity.en_id, &ext,
 						 &data, &attr,
 						 m0_obj_layout_id_to_unit_size(
