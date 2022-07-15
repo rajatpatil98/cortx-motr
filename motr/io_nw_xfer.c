@@ -894,9 +894,10 @@ int target_calculate_checksum(struct m0_op_io *ioo,
 			(filter == PA_PARITY) ? "P":"D",
 			(cs_idx->ci_pg_idx + ioo->ioo_iomaps[0]->pi_grpid),
 			cs_idx->ci_unit_idx,(int)rows_nr(play, obj),b_idx);
-	bvec.ov_vec.v_nr = b_idx;
 
+	bvec.ov_vec.v_nr = b_idx;
 	rc = m0_client_calculate_pi( pi, &seed, &bvec, flag, context, NULL);
+	// print_pi_write(pi, m0_cksum_get_size(pi_type));
 	m0_bufvec_free2(&bvec);
 	return rc;
 }
@@ -968,7 +969,7 @@ static int target_ioreq_prepare_checksum(struct m0_op_io *ioo,
 			memcpy(rw_fop->crw_di_data_cksum.b_addr +
 			       computed_cksm_nob,
 			       ioo->ioo_attr.ov_buf[unit_off], cksum_size);
-
+			// print_pi_write(ioo->ioo_attr.ov_buf[unit_off], cksum_size);
 		}
 		computed_cksm_nob += cksum_size;
 		M0_ASSERT(computed_cksm_nob <= rw_fop->crw_di_data_cksum.b_nob);
