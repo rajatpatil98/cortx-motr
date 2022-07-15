@@ -102,7 +102,7 @@
 #include "motr/m0crate/crate_client_utils.h"
 #include "lib/cksum_utils.h"
 
-#define M0CRATE_IO_DI_TYP M0_PI_TYPE_MD5
+#define M0CRATE_IO_DI_TYP M0_PI_TYPE_MD5_INC_CONTEXT
 
 extern struct crate_conf *conf;
 

@@ -788,29 +788,21 @@ static uint64_t target_get_pg_array_idx(struct m0_op_io *ioo, uint64_t pg_idx)
 	uint64_t i;
 	uint64_t pg_idx_abs;
 
+	/* Attemt to get the pg array index in optimized way */
 	pg_idx_abs = pg_idx + ioo->ioo_iomaps[0]->pi_grpid;
 	if (pg_idx < ioo->ioo_iomap_nr &&
 	    ioo->ioo_iomaps[pg_idx]->pi_grpid == pg_idx_abs)
 		return pg_idx;
+	/*
+	 * In case pg array index is not obtained go through all the available
+	 * pg group.
+	 */
 	for (i = 0; i < ioo->ioo_iomap_nr; i++) {
 		if (ioo->ioo_iomaps[i]->pi_grpid == pg_idx_abs)
 			return i;
 	}
 	/* Parity group id not found in an array so there is some bug */
 	M0_ASSERT(0);
-}
-
-static void print_pi_write(void *pi,int size)
-{
-	int i;
-	char arr[size * 3];
-	char *ptr = pi;
-	M0_LOG(M0_WARN,">>>>>>>>>>>>>>>>>>[PI Values]<<<<<<<<<<<<<<<<<");
-	for (i = 0; i < size; i++)
-	{
-		sprintf(&arr[i*3],"%02x ",ptr[i] & 0xff);
-	}
-	M0_LOG(M0_WARN,"%s ",(char *)arr);
 }
 
 /* This function will compute parity checksum in chksm_buf all other
@@ -905,7 +897,6 @@ int target_calculate_checksum(struct m0_op_io *ioo,
 	bvec.ov_vec.v_nr = b_idx;
 
 	rc = m0_client_calculate_pi( pi, &seed, &bvec, flag, context, NULL);
-	print_pi_write(pi, m0_cksum_get_size(pi_type));
 	m0_bufvec_free2(&bvec);
 	return rc;
 }
@@ -924,7 +915,6 @@ static int target_ioreq_prepare_checksum(struct m0_op_io *ioo,
 	uint32_t                          cksum_size;
 	struct fop_cksum_data 		     *cs_data;
 	struct fop_cksum_idx_data 	     *cs_idx_data;
-
 
 	/* Get checksum size and type */
 	cksum_size = m0__obj_di_cksum_size(ioo);
@@ -959,7 +949,6 @@ static int target_ioreq_prepare_checksum(struct m0_op_io *ioo,
 				return rc;
 			}
 		} else {
-			uint8_t temp_cs[128];
 			/* Case where application is passing checksum */
 			uint32_t unit_off;
 			struct m0_pdclust_layout *play = pdlayout_get(ioo);
@@ -968,32 +957,19 @@ static int target_ioreq_prepare_checksum(struct m0_op_io *ioo,
 				   layout_n(play) + cs_idx_data->ci_unit_idx -
 				   ti->ti_unit_off;
 
-			if (unit_off < ioo->ioo_attr.ov_vec.v_nr) {
-				memcpy(rw_fop->crw_di_data_cksum.b_addr +
-				       computed_cksm_nob,
-				       ioo->ioo_attr.ov_buf[unit_off], cksum_size);
-				print_pi_write(ioo->ioo_attr.ov_buf[unit_off], cksum_size);
-				rc = target_calculate_checksum( ioo, cksum_type, irfop->irf_pattr,
-					cs_idx_data, temp_cs);
-				if (memcmp(ioo->ioo_attr.ov_buf[unit_off],
-				    temp_cs, cksum_size) != 0) {
-					int k;
-					for (k = 0; k < ioo->ioo_attr.ov_vec.v_nr; k++) {
-						printf("#%d:", k);
-						print_pi_write(ioo->ioo_attr.ov_buf[k], cksum_size);
-					}
-					M0_ASSERT(0);
-				}
-			}
-
-			M0_LOG(M0_ALWAYS,"COPIED CKSUM Sts:%d Typ:%d Sz:%d UTyp:[%s] [PG Idx:%" PRIu64 "][Unit Idx:%"PRIu64"]",
-			unit_off < ioo->ioo_attr.ov_vec.v_nr,
-			(int)cksum_type, m0_cksum_get_size(cksum_type),
+			M0_LOG(M0_ALWAYS,"COPIED CKSUM UOff:%d Typ:%d Sz:%d"
+			  " UTyp:[%s] [PG Idx:%" PRIu64 "][Unit Idx:%"PRIu64"]",
+			unit_off, (int)cksum_type, m0_cksum_get_size(cksum_type),
 			(irfop->irf_pattr == PA_PARITY) ? "P":"D",
 			(cs_idx_data->ci_pg_idx + ioo->ioo_iomaps[0]->pi_grpid),
 			cs_idx_data->ci_unit_idx);
-		}
 
+			M0_ASSERT(unit_off < ioo->ioo_attr.ov_vec.v_nr);
+			memcpy(rw_fop->crw_di_data_cksum.b_addr +
+			       computed_cksm_nob,
+			       ioo->ioo_attr.ov_buf[unit_off], cksum_size);
+
+		}
 		computed_cksm_nob += cksum_size;
 		M0_ASSERT(computed_cksm_nob <= rw_fop->crw_di_data_cksum.b_nob);
 	}
@@ -1168,6 +1144,12 @@ static int target_ioreq_iofops_prepare(struct target_ioreq *ti,
 		/* Need to update PG & Unit index for every seg_per_unit */
 		pgdata.seg_per_unit = layout_unit_size(pdlayout_get(ioo))/seg_sz;
 		if (m0__obj_is_di_cksum_input_enabled(ioo)) {
+			/*
+			 * Need to find the unit offset of first ioo_extent to
+			 * correctly locate checksum in attr array using parity
+			 * group and unit index. Need not handle for the case
+			 * K > N as checksum is copied only for data.
+			 */
 			ti->ti_unit_off = ioo->ioo_ext.iv_index[0] %
 					  (layout_n(play) * pgdata.unit_sz);
 			ti->ti_unit_off = ti->ti_unit_off / pgdata.unit_sz;

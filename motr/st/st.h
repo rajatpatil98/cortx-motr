@@ -37,7 +37,7 @@
 #endif
 
 /** Default DI selection for ST */
-#define M0_ST_DI_TYP (M0_PI_TYPE_MD5)
+#define M0_ST_DI_TYP (M0_PI_TYPE_MD5_INC_CONTEXT)
 
 /**
  * @defgroup Client ST framework

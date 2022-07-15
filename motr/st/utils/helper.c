@@ -40,7 +40,7 @@
 #include "lib/cksum_data.h"
 #include "lib/cksum_utils.h"
 
-#define M0HELPER_IO_DI_TYP M0_PI_TYPE_MD5
+#define M0HELPER_IO_DI_TYP M0_PI_TYPE_MD5_INC_CONTEXT
 
 extern struct m0_addb_ctx m0_addb_ctx;
 
