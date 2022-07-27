@@ -41,10 +41,10 @@ struct crate_conf {
         bool is_addb_init;
         bool is_oostrore;
         bool is_read_verify;
-		/* This can take value of M0_ENF_DI (4) or M0_ENF_GEN_DI (8) from enum
-		 * m0_entity_flags
-		 */
-		uint32_t di_flag;
+        /* This can take value of M0_ENF_DI (4) or M0_ENF_GEN_DI (8) from enum
+         * m0_entity_flags
+         */
+        uint32_t di_flag;
         char *local_addr;
         char *ha_addr;
         char *prof;

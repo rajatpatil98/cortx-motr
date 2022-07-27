@@ -809,8 +809,8 @@ struct target_ioreq {
 	 * Index vector of global object offset which is added to this target.
 	 * This global offset vector helps to compute PG Idx and Unit Idx.
 	 * For the PG and Unit Index Computation
-	 * DATA   Units : Gob Offset - PGStart : PGStart + NxUS => PG Index - 0 : (N-1) 
-	 * PARITY Units : Gob Offset - PGStart : PGStart + KxUS => PG Index - 0 : (K-1) 
+	 * DATA   Units : Gob Offset - PGStart : PGStart + NxUS => PG Index - 0 : (N-1)
+	 * PARITY Units : Gob Offset - PGStart : PGStart + KxUS => PG Index - 0 : (K-1)
 	 */
 	struct m0_indexvec             ti_goff_ivec;
 
@@ -850,11 +850,12 @@ struct target_ioreq {
  * Data structure for PG indexing computation
  */
 struct fop_cksum_idx_gbl_data {
-	m0_bcount_t                  pgrp_size;
-	uint32_t                     pi_grpid;
-	m0_bcount_t                  pgrp0_index;
-	uint32_t                     unit_sz;
-	uint32_t                     seg_per_unit;
+	m0_bcount_t                  fg_pgrp_sz;
+	uint32_t                     fg_pi_grpid;
+	m0_bcount_t                  fg_pgrp0_index;
+	uint32_t                     fg_unit_sz;
+	uint32_t                     fg_seg_per_unit;
+	uint32_t                     fg_seg_sz;
 };
 
 /**
@@ -872,11 +873,11 @@ struct fop_cksum_idx_data {
  * Collection of data structure for checksum computation
  */
 struct fop_cksum_data {
-	// Checksum data structure
+	/** Checksum data structure. */
 	struct fop_cksum_idx_data  *cd_idx;
-	// Number of units added
+	/** Number of units added. */
 	uint32_t                    cd_num_units;
-	// Maximum number of units
+	/** Maximum number of units. */
 	uint32_t                    cd_max_units;
 };
 
@@ -898,7 +899,7 @@ struct ioreq_fop {
 	int                          irf_reply_rc;
 
 	/** Checksum related: Unit start index (cd_idx) & count for tracking */
-	struct fop_cksum_data  		 irf_cksum_data;
+	struct fop_cksum_data        irf_cksum_data;
 
 	/** In-memory handle for IO fop. */
 	struct m0_io_fop             irf_iofop;

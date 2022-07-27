@@ -33,9 +33,6 @@
 
 #define M0_CKSUM_DATA_ROUNDOFF_BYTE (16)
 
-/* Default checksum type, TODO_DI: Get from config */
-#define M0_CKSUM_DEFAULT_PI M0_PI_TYPE_MD5
-
 /*
  * Macro calculates the size of padding required in a struct
  * for byte alignment
@@ -43,7 +40,7 @@
  * alignment - power of two, byte alignment
  */
 #define M0_CALC_PAD(size, alignment) \
-		(size%alignment ? (((size/alignment + 1 ) * alignment) - size) : 0)
+	(size%alignment ? (((size/alignment + 1 ) * alignment) - size) : 0)
 
 /* Constants for protection info type, max types supported is 255 */
 enum m0_pi_algo_type
@@ -53,6 +50,11 @@ enum m0_pi_algo_type
 	M0_PI_TYPE_MD5_INC_CONTEXT,
 	M0_PI_TYPE_CRC,
 	M0_PI_TYPE_MAX
+};
+
+/* Default checksum type, TODO_DI: Get from config */
+enum {
+	M0_CKSUM_DEFAULT_PI = M0_PI_TYPE_MD5
 };
 
 enum m0_pi_calc_flag {
